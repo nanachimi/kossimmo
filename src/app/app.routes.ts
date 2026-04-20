@@ -1,5 +1,6 @@
 import type { Route, Routes } from "@angular/router";
 import { ROUTE_PATHS, type RouteKey } from "./core/route-paths";
+import { adminAuthGuard } from "./core/guards/admin-auth.guard";
 
 /**
  * Register a route under BOTH the FR and EN paths for a given
@@ -149,9 +150,23 @@ export const routes: Routes = [
 
   // ─── Backoffice (admin) ──────────────────────────────────────
   // Internal-only surface. URL is NOT localized — it's a tool,
-  // not a marketing page. Nested routes render inside the shell.
+  // not a marketing page.
+  //
+  // The login page is a sibling of the shell so it renders
+  // chromeless (no sidebar / topbar). Every other admin route is
+  // wrapped in the shell AND protected by adminAuthGuard.
+  {
+    path: "backoffice/login",
+    loadComponent: () =>
+      import("./features/admin/login/admin-login.component").then(
+        (m) => m.AdminLoginComponent,
+      ),
+    title: "Connexion — Backoffice Kossimmo",
+  },
   {
     path: "backoffice",
+    canActivate: [adminAuthGuard],
+    canActivateChild: [adminAuthGuard],
     loadComponent: () =>
       import("./features/admin/admin-shell.component").then(
         (m) => m.AdminShellComponent,

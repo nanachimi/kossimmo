@@ -189,7 +189,7 @@ export const MOCK_EMPLOYEES: readonly Employee[] = [
   {
     id: "e-001",
     name: "Sarah Biya",
-    email: "sarah@kossimmo.cm",
+    email: "sarah@kossimmo.com",
     role: "admin",
     city: "Douala",
     hiredAt: "2025-03-15",
@@ -200,7 +200,7 @@ export const MOCK_EMPLOYEES: readonly Employee[] = [
   {
     id: "e-002",
     name: "Emmanuel Fouda",
-    email: "emmanuel@kossimmo.cm",
+    email: "emmanuel@kossimmo.com",
     role: "caseworker",
     city: "Yaoundé",
     hiredAt: "2025-05-02",
@@ -211,7 +211,7 @@ export const MOCK_EMPLOYEES: readonly Employee[] = [
   {
     id: "e-003",
     name: "Rita Mendouga",
-    email: "rita@kossimmo.cm",
+    email: "rita@kossimmo.com",
     role: "verifier",
     city: "Douala",
     hiredAt: "2025-08-20",
@@ -222,7 +222,7 @@ export const MOCK_EMPLOYEES: readonly Employee[] = [
   {
     id: "e-004",
     name: "Thierry Ekwalla",
-    email: "thierry@kossimmo.cm",
+    email: "thierry@kossimmo.com",
     role: "verifier",
     city: "Douala",
     hiredAt: "2025-11-10",
@@ -233,7 +233,7 @@ export const MOCK_EMPLOYEES: readonly Employee[] = [
   {
     id: "e-005",
     name: "Laure Kamdem",
-    email: "laure@kossimmo.cm",
+    email: "laure@kossimmo.com",
     role: "verifier",
     city: "Bafoussam",
     hiredAt: "2026-02-01",
@@ -244,7 +244,7 @@ export const MOCK_EMPLOYEES: readonly Employee[] = [
   {
     id: "e-006",
     name: "Patrick Mvondo",
-    email: "patrick@kossimmo.cm",
+    email: "patrick@kossimmo.com",
     role: "content",
     city: "Yaoundé",
     hiredAt: "2025-10-14",
@@ -255,7 +255,7 @@ export const MOCK_EMPLOYEES: readonly Employee[] = [
   {
     id: "e-007",
     name: "Joséphine Ndo",
-    email: "josephine@kossimmo.cm",
+    email: "josephine@kossimmo.com",
     role: "verifier",
     city: "Douala",
     hiredAt: "2025-12-18",

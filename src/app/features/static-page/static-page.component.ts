@@ -55,8 +55,8 @@ const COPY: Readonly<Record<PageKey, PageCopy>> = {
     },
     body: [
       {
-        fr: "Email : hello@kossimmo.cm · WhatsApp : +237 6 77 00 12 34 · Adresse : Bonanjo, Douala. Nous répondons sous 24h les jours ouvrés.",
-        en: "Email: hello@kossimmo.cm · WhatsApp: +237 6 77 00 12 34 · Address: Bonanjo, Douala. We reply within 24h on business days.",
+        fr: "Email : hello@kossimmo.com · WhatsApp : +237 6 77 00 12 34 · Adresse : Bonanjo, Douala. Nous répondons sous 24h les jours ouvrés.",
+        en: "Email: hello@kossimmo.com · WhatsApp: +237 6 77 00 12 34 · Address: Bonanjo, Douala. We reply within 24h on business days.",
       },
     ],
   },
@@ -81,8 +81,8 @@ const COPY: Readonly<Record<PageKey, PageCopy>> = {
     },
     body: [
       {
-        fr: "En utilisant Kossimmo, vous acceptez les présentes conditions. Document détaillé à venir avant la mise en production. Pour toute question juridique contactez legal@kossimmo.cm.",
-        en: "By using Kossimmo, you agree to these terms. Full document coming before production. For legal questions contact legal@kossimmo.cm.",
+        fr: "En utilisant Kossimmo, vous acceptez les présentes conditions. Document détaillé à venir avant la mise en production. Pour toute question juridique contactez legal@kossimmo.com.",
+        en: "By using Kossimmo, you agree to these terms. Full document coming before production. For legal questions contact legal@kossimmo.com.",
       },
     ],
   },

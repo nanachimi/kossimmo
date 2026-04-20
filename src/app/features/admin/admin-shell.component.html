@@ -36,17 +36,25 @@
     </nav>
 
     <div class="ad__foot">
-      <div class="ad__who">
-        <div class="ad__avatar" aria-hidden="true">SB</div>
-        <div>
-          <strong>Sarah Biya</strong>
-          <span>Admin · Douala</span>
+      @if (auth.session(); as user) {
+        <div class="ad__who">
+          <app-monogram [name]="user.name" style="--mono-size: 38px;" />
+          <div class="ad__who-meta">
+            <strong>{{ user.name }}</strong>
+            <span>{{ roleLabel(user.role) }} · {{ user.city }}</span>
+          </div>
         </div>
+      }
+      <div class="ad__foot-actions">
+        <a routerLink="/" class="ad__exit">
+          <app-icon name="arrow" [size]="14" />
+          <span>{{ i18n.locale() === 'fr' ? 'Retour au site' : 'Back to site' }}</span>
+        </a>
+        <button type="button" class="ad__logout" (click)="logout()">
+          <app-icon name="close" [size]="14" [strokeWidth]="2" />
+          <span>{{ i18n.locale() === 'fr' ? 'Déconnexion' : 'Sign out' }}</span>
+        </button>
       </div>
-      <a routerLink="/" class="ad__exit">
-        <app-icon name="arrow" [size]="14" />
-        <span>{{ i18n.locale() === 'fr' ? 'Retour au site' : 'Back to site' }}</span>
-      </a>
     </div>
   </aside>
 

@@ -1,0 +1,205 @@
+:host { display: block; }
+
+.al {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6) var(--space-5);
+  background: #0a0a0a;
+  color: var(--paper);
+}
+
+// ─── Discreet exit link ──────────────────────────────────
+.al__exit {
+  position: absolute;
+  top: var(--space-5);
+  left: var(--space-5);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(250, 250, 247, 0.5);
+  transition: color var(--dur-sm) var(--ease-out);
+
+  app-icon { transform: rotate(180deg); }
+
+  &:hover { color: var(--paper); }
+}
+
+// ─── Center column ──────────────────────────────────────
+.al__box {
+  width: 100%;
+  max-width: 22rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  animation: alIn 420ms var(--ease-out);
+}
+
+@keyframes alIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.al__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: rgba(250, 250, 247, 0.04);
+  border: 1px solid rgba(250, 250, 247, 0.08);
+  color: var(--paper);
+  align-self: center;
+}
+
+.al__title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+  text-align: center;
+  line-height: 1.1;
+}
+
+.al__sub {
+  margin-top: -0.75rem;
+  color: rgba(250, 250, 247, 0.45);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+// ─── Form ───────────────────────────────────────────────
+.al__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.al__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--paper);
+  }
+
+  input {
+    padding: 0.75rem 0.95rem;
+    background: rgba(250, 250, 247, 0.03);
+    border: 1px solid rgba(250, 250, 247, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--paper);
+    font-size: 0.92rem;
+    font-family: var(--font-body);
+    transition: border-color var(--dur-sm) var(--ease-out),
+      background-color var(--dur-sm) var(--ease-out),
+      box-shadow var(--dur-sm) var(--ease-out);
+
+    &::placeholder { color: rgba(250, 250, 247, 0.3); }
+
+    &:hover { border-color: rgba(250, 250, 247, 0.2); }
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(250, 250, 247, 0.05);
+      box-shadow: 0 0 0 3px rgba(255, 78, 26, 0.2);
+    }
+
+    &[aria-invalid="true"] {
+      border-color: var(--alert);
+    }
+  }
+}
+
+.al__error {
+  font-size: 0.82rem;
+  color: #ff8a7a;
+  padding: 0.2rem 0.1rem;
+}
+
+.al__submit {
+  margin-top: 0.3rem;
+  padding: 0.85rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color var(--dur-sm) var(--ease-out),
+    transform var(--dur-sm) var(--ease-out),
+    opacity var(--dur-sm) var(--ease-out);
+
+  &:hover:not(:disabled) {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.al__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: alSpin 0.7s linear infinite;
+}
+
+@keyframes alSpin {
+  to { transform: rotate(360deg); }
+}
+
+// ─── Demo hint (single line) ────────────────────────────
+.al__demo {
+  margin-top: var(--space-3);
+  padding: 0.65rem 0.8rem;
+  background: rgba(250, 250, 247, 0.03);
+  border: 1px dashed rgba(250, 250, 247, 0.1);
+  border-radius: var(--radius-xs);
+  font-size: 0.75rem;
+  text-align: center;
+  color: rgba(250, 250, 247, 0.45);
+
+  span { margin-right: 0.3rem; }
+}
+
+.al__demo-link {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: rgba(250, 250, 247, 0.7);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(250, 250, 247, 0.25);
+
+  &:hover { color: var(--accent); text-decoration-color: var(--accent); }
+}

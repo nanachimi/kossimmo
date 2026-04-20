@@ -1,0 +1,74 @@
+<section class="al">
+  <a routerLink="/" class="al__exit" aria-label="Retour au site public">
+    <app-icon name="chevron" [size]="14" />
+    <span>Site public</span>
+  </a>
+
+  <div class="al__box">
+    <span class="al__mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" width="28" height="28" fill="none">
+        <path d="M4 28 L4 14.5 L16 4 L28 14.5 L28 28 Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M13.5 28 V22 C13.5 20.5 14.6 19.5 16 19.5 C17.4 19.5 18.5 20.5 18.5 22 V28 Z" fill="#ff4e1a"/>
+      </svg>
+    </span>
+
+    <h1 class="al__title">Admin · Kossimmo</h1>
+    <p class="al__sub">Backoffice</p>
+
+    <form class="al__form" (submit)="$event.preventDefault(); submit()" novalidate>
+      <div class="al__field">
+        <label for="al-email">Email</label>
+        <input
+          id="al-email"
+          type="email"
+          inputmode="email"
+          autocomplete="username"
+          placeholder="prenom.nom&#64;kossimmo.com"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          name="email"
+          required
+          [attr.aria-invalid]="error() ? 'true' : null"
+        />
+      </div>
+
+      <div class="al__field">
+        <label for="al-pw">Mot de passe</label>
+        <input
+          id="al-pw"
+          type="password"
+          autocomplete="current-password"
+          placeholder="••••••••"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          name="password"
+          required
+          [attr.aria-invalid]="error() ? 'true' : null"
+        />
+      </div>
+
+      @if (error()) {
+        <p class="al__error" role="alert">{{ error() }}</p>
+      }
+
+      <button
+        type="submit"
+        class="al__submit"
+        [class.is-loading]="submitting()"
+        [disabled]="submitting() || !email() || !password()"
+      >
+        @if (submitting()) {
+          <span class="al__spinner" aria-hidden="true"></span>
+        }
+        <span>Se connecter</span>
+      </button>
+    </form>
+
+    <p class="al__demo">
+      <span>Démo :</span>
+      <button type="button" class="al__demo-link" (click)="useDemo()">
+        sarah.biya&#64;kossimmo.com / kossimmo2026
+      </button>
+    </p>
+  </div>
+</section>
