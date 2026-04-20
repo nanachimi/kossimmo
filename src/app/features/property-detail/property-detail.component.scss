@@ -3,14 +3,49 @@
 .pd { padding-bottom: var(--space-16); }
 
 // ─── Gallery ────────────────────────────────────────────
+// The hero bleeds full-width on the LEFT but its right edge is
+// pinned to where the `.container` content area ends — so the
+// image finishes exactly where the sticky price sidebar ends.
+// Creates editorial asymmetry + a clean vertical line down the
+// right side of the layout.
+//
+// We avoid `max()` wrapping `calc()` here because dart-sass can
+// silently drop that combo. Instead we use plain media-query
+// breakpoints:
+//   - viewport fluid, container fills it       → pad with container gutter
+//   - viewport > container max-width + gutters → pad with the
+//     auto-margin-left + container gutter so the edge lands on
+//     the sidebar.
+// `.container` max-width is 82rem (1312px); at space-8 = 3rem
+// gutter on each side, the crossover is 82rem + 6rem = 88rem
+// (1408px).
 .pd__gallery {
   margin-bottom: var(--space-6);
+  padding-right: var(--space-5);
+
+  @media (min-width: 768px) {
+    padding-right: var(--space-6);
+  }
+
+  @media (min-width: 1200px) {
+    padding-right: var(--space-8);
+  }
+
+  @media (min-width: 88rem) {
+    // Container is now centered with auto margins. Right gap from
+    // viewport edge = (100% - 82rem) / 2 + container's right gutter.
+    padding-right: calc((100% - var(--container)) / 2 + var(--space-8));
+  }
 }
 
 .pd__main {
   position: relative;
-  aspect-ratio: 16 / 9;
-  max-height: 66vh;
+  // Keep the hero edge-to-edge: fill the parent horizontally, cap
+  // the height with clamp. The previous `aspect-ratio + max-height`
+  // combo made the browser shrink width to preserve the ratio once
+  // the height cap kicked in — producing a right-side gap on desktop.
+  width: 100%;
+  height: clamp(18rem, 66vh, 48rem);
   overflow: hidden;
   background: var(--surface-inset);
   cursor: zoom-in;
