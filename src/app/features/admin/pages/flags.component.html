@@ -1,0 +1,57 @@
+<section class="fl">
+  <header class="fl__head">
+    <div>
+      <span class="eyebrow">— {{ i18n.locale() === 'fr' ? 'Configuration' : 'Configuration' }}</span>
+      <h1 class="fl__title">
+        Feature flags
+      </h1>
+      <p class="muted">
+        {{ i18n.locale() === 'fr'
+          ? 'Chaque fonctionnalité a deux leviers : visible ou cachée, gratuite ou premium. Les changements sont instantanés dans toute l\'application.'
+          : 'Every feature has two switches: visible or hidden, free or premium. Changes apply instantly across the app.' }}
+      </p>
+    </div>
+  </header>
+
+  <div class="fl__table">
+    <div class="fl__row fl__row--head">
+      <span>{{ i18n.locale() === 'fr' ? 'Fonctionnalité' : 'Feature' }}</span>
+      <span>{{ i18n.locale() === 'fr' ? 'Clé' : 'Key' }}</span>
+      <span class="fl__col-toggle">{{ i18n.locale() === 'fr' ? 'Actif' : 'Enabled' }}</span>
+      <span class="fl__col-toggle">{{ i18n.locale() === 'fr' ? 'Premium' : 'Premium' }}</span>
+    </div>
+
+    @for (f of flagService.flags(); track f.key) {
+      <div class="fl__row" [class.is-disabled]="!f.enabled">
+        <div class="fl__meta">
+          <strong>{{ f.label[i18n.locale()] }}</strong>
+          @if (f.premium) {
+            <app-badge tone="accent">Premium</app-badge>
+          } @else {
+            <app-badge tone="success">{{ i18n.locale() === 'fr' ? 'Gratuit' : 'Free' }}</app-badge>
+          }
+        </div>
+        <code class="fl__key mono">{{ f.key }}</code>
+
+        <label class="fl__toggle">
+          <input type="checkbox" [checked]="f.enabled" (change)="toggle(f.key, 'enabled')" [attr.aria-label]="'Toggle ' + f.key + ' enabled'" />
+          <span class="fl__track" aria-hidden="true"></span>
+        </label>
+
+        <label class="fl__toggle">
+          <input type="checkbox" [checked]="f.premium" (change)="toggle(f.key, 'premium')" [attr.aria-label]="'Toggle ' + f.key + ' premium'" />
+          <span class="fl__track fl__track--accent" aria-hidden="true"></span>
+        </label>
+      </div>
+    }
+  </div>
+
+  <aside class="fl__note">
+    <app-icon name="sparkles" [size]="18" />
+    <p>
+      {{ i18n.locale() === 'fr'
+        ? 'Les paiements Mobile Money seront activés dès que les intégrations MTN/Orange sont finalisées. Jusque-là, toute fonctionnalité marquée « Premium » reste affichée avec un badge « Bientôt ».'
+        : 'Mobile Money payments will turn on as soon as the MTN/Orange integrations land. Until then, any feature flagged Premium shows a "Coming soon" badge.' }}
+    </p>
+  </aside>
+</section>

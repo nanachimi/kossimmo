@@ -1,0 +1,107 @@
+<section class="tm">
+  <header class="tm__head">
+    <div>
+      <span class="eyebrow">— {{ i18n.locale() === 'fr' ? 'Équipe interne' : 'Internal team' }}</span>
+      <h1 class="tm__title">
+        {{ i18n.locale() === 'fr' ? 'Vérificateurs' : 'Verifiers' }}
+        <span class="display-italic">&amp; équipe.</span>
+      </h1>
+      <p class="muted">{{ i18n.locale() === 'fr' ? 'Les personnes qui font tourner la plateforme au quotidien.' : 'The people who keep the platform running every day.' }}</p>
+    </div>
+    <button appButton variant="primary" size="sm">
+      <app-icon slot="leading" name="user" [size]="14" />
+      {{ i18n.locale() === 'fr' ? 'Recruter' : 'Hire' }}
+    </button>
+  </header>
+
+  <dl class="tm__stats">
+    <div>
+      <dt>{{ i18n.locale() === 'fr' ? 'Effectif total' : 'Headcount' }}</dt>
+      <dd class="mono">{{ teamStats().headcount }}</dd>
+    </div>
+    <div>
+      <dt>{{ i18n.locale() === 'fr' ? 'Vérificateurs actifs' : 'Active verifiers' }}</dt>
+      <dd class="mono">{{ teamStats().verifiersActive }}/{{ teamStats().verifiers }}</dd>
+    </div>
+    <div>
+      <dt>{{ i18n.locale() === 'fr' ? 'Vérifications ce mois' : 'Verifications this month' }}</dt>
+      <dd class="mono">{{ teamStats().verifiedThisMonth }}</dd>
+    </div>
+    <div>
+      <dt>{{ i18n.locale() === 'fr' ? 'Temps moyen' : 'Avg review time' }}</dt>
+      <dd class="mono">{{ teamStats().avgReview }} min</dd>
+    </div>
+  </dl>
+
+  <div class="tm__filters">
+    <span>{{ i18n.locale() === 'fr' ? 'Filtrer par rôle' : 'Filter by role' }}</span>
+    @for (r of roles; track r) {
+      <app-chip [active]="filterRole() === r" (clicked)="filterRole.set(r)">{{ roleLabel(r) }}</app-chip>
+    }
+  </div>
+
+  <ul class="tm__grid" role="list">
+    @for (e of filtered(); track e.id; let i = $index) {
+      <li class="tm__card" [style.--reveal-i]="i">
+        <header>
+          <app-monogram [name]="e.name" style="--mono-size: 48px;" />
+          <div>
+            <strong>{{ e.name }}</strong>
+            <span>{{ e.email }}</span>
+          </div>
+          <app-badge [tone]="statusTone(e.status)">{{ statusLabel(e.status) }}</app-badge>
+        </header>
+
+        <div class="tm__row">
+          <span class="tm__label">{{ i18n.locale() === 'fr' ? 'Rôle' : 'Role' }}</span>
+          <span class="tm__value">{{ roleLabel(e.role) }}</span>
+        </div>
+        <div class="tm__row">
+          <span class="tm__label">{{ i18n.locale() === 'fr' ? 'Ville' : 'City' }}</span>
+          <span class="tm__value">{{ e.city }}</span>
+        </div>
+        <div class="tm__row">
+          <span class="tm__label">{{ i18n.locale() === 'fr' ? 'Embauché' : 'Hired' }}</span>
+          <span class="tm__value mono">{{ e.hiredAt }}</span>
+        </div>
+
+        @if (e.role === 'verifier' || e.role === 'caseworker') {
+          <footer class="tm__perf">
+            <div>
+              <span class="tm__perf-label">{{ i18n.locale() === 'fr' ? 'Vérifiés ce mois' : 'This month' }}</span>
+              <strong class="mono">{{ e.verifiedThisMonth }}</strong>
+            </div>
+            <div>
+              <span class="tm__perf-label">{{ i18n.locale() === 'fr' ? 'Temps moyen' : 'Avg time' }}</span>
+              <strong class="mono">{{ e.avgReviewMinutes }} min</strong>
+            </div>
+          </footer>
+        }
+      </li>
+    }
+  </ul>
+
+  <!-- Recruitment CTA -->
+  <section class="tm__recruit">
+    <div>
+      <span class="eyebrow">— {{ i18n.locale() === 'fr' ? 'Recrutement' : 'Recruitment' }}</span>
+      <h2>
+        {{ i18n.locale() === 'fr' ? 'Nous recrutons' : 'We are hiring' }}
+        <span class="display-italic"> 4 vérificateurs</span>
+      </h2>
+      <p class="muted">
+        {{ i18n.locale() === 'fr'
+          ? 'Douala (2), Yaoundé (1), Bafoussam (1). Profil : 2 ans+ en immobilier, rigoureux, smartphone récent, moto bienvenue.'
+          : 'Douala (2), Yaoundé (1), Bafoussam (1). 2+ years in real estate, methodical, recent smartphone, motorcycle a plus.' }}
+      </p>
+    </div>
+    <div class="tm__recruit-actions">
+      <button appButton variant="primary">
+        {{ i18n.locale() === 'fr' ? 'Publier une offre' : 'Post an opening' }}
+      </button>
+      <button appButton variant="secondary">
+        {{ i18n.locale() === 'fr' ? 'Voir les candidatures' : 'View applicants' }}
+      </button>
+    </div>
+  </section>
+</section>

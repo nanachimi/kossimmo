@@ -1,0 +1,29 @@
+// ═══════════════════════════════════════════════════════════════════
+// Kossimmo — Global Stylesheet
+// ═══════════════════════════════════════════════════════════════════
+// Fonts: Space Grotesk (variable display) + Inter (variable body)
+// + JetBrains Mono (numerics). Served from Google Fonts.
+
+@use "styles/tokens";
+@use "styles/reset";
+@use "styles/utilities";
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400..600&family=Space+Grotesk:wght@300..700&display=swap");
+
+body {
+  position: relative;
+}
+
+// Very subtle grain on paper background — keeps it from feeling sterile
+// but at a fraction of the previous intensity (modern palette breathes).
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.08 0 0 0 0 0.08 0 0 0 0.9 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+  mix-blend-mode: multiply;
+}

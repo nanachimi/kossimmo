@@ -1,0 +1,163 @@
+<section class="au">
+  <div class="au__grid">
+    <!-- Form column -->
+    <div class="au__col au__col--form">
+      <div class="au__box">
+        <a routerLink="/" class="au__brand" aria-label="Kossimmo">
+          <svg viewBox="0 0 32 32" width="26" height="26" fill="none" aria-hidden="true">
+            <path d="M4 28 L4 14.5 L16 4 L28 14.5 L28 28 Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M13.5 28 V22 C13.5 20.5 14.6 19.5 16 19.5 C17.4 19.5 18.5 20.5 18.5 22 V28 Z" fill="#ff4e1a"/>
+          </svg>
+          <span>{{ 'brand.name' | t }}</span>
+        </a>
+
+        @if (!otpOpen()) {
+          <!-- Mode tabs -->
+          <div class="au__tabs" role="tablist">
+            <button type="button" role="tab"
+              [attr.aria-selected]="mode() === 'signin'"
+              [class.is-active]="mode() === 'signin'"
+              (click)="setMode('signin')">
+              {{ i18n.locale() === 'fr' ? 'Connexion' : 'Sign in' }}
+            </button>
+            <button type="button" role="tab"
+              [attr.aria-selected]="mode() === 'signup'"
+              [class.is-active]="mode() === 'signup'"
+              (click)="setMode('signup')">
+              {{ i18n.locale() === 'fr' ? 'Créer un compte' : 'Create account' }}
+            </button>
+          </div>
+
+          <h1 class="au__title">
+            @if (mode() === 'signin') {
+              {{ i18n.locale() === 'fr' ? 'Bon retour.' : 'Welcome back.' }}
+            } @else {
+              {{ i18n.locale() === 'fr' ? 'Bienvenue sur' : 'Welcome to' }}
+              <span class="display-italic"> {{ 'brand.name' | t }}.</span>
+            }
+          </h1>
+          <p class="au__sub">
+            @if (mode() === 'signin') {
+              {{ i18n.locale() === 'fr' ? 'Reprenez vos recherches et vos favoris.' : 'Pick up your searches and favorites.' }}
+            } @else {
+              {{ i18n.locale() === 'fr' ? "Choisissez comment vous comptez utiliser Kossimmo." : 'Choose how you plan to use Kossimmo.' }}
+            }
+          </p>
+
+          <form class="au__form" (submit)="$event.preventDefault(); submit()">
+            @if (mode() === 'signup') {
+              <div class="au__role">
+                <label>{{ i18n.locale() === 'fr' ? 'Votre rôle' : 'Your role' }}</label>
+                <div class="au__role-chips">
+                  <app-chip [active]="role() === 'seeker'" (clicked)="setRole('seeker')">
+                    {{ i18n.locale() === 'fr' ? 'Mieter / Acheteur' : 'Renter / Buyer' }}
+                  </app-chip>
+                  <app-chip [active]="role() === 'owner'" (clicked)="setRole('owner')">
+                    {{ i18n.locale() === 'fr' ? 'Propriétaire' : 'Owner' }}
+                  </app-chip>
+                  <app-chip [active]="role() === 'agent'" (clicked)="setRole('agent')">
+                    {{ i18n.locale() === 'fr' ? 'Agent / Agence' : 'Agent / Agency' }}
+                  </app-chip>
+                </div>
+              </div>
+
+              <div class="au__field">
+                <label for="au-name">{{ i18n.locale() === 'fr' ? 'Nom complet' : 'Full name' }}</label>
+                <input id="au-name" type="text" autocomplete="name"
+                  [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" />
+              </div>
+            }
+
+            <div class="au__field">
+              <label for="au-phone">{{ i18n.locale() === 'fr' ? 'Téléphone' : 'Phone' }}</label>
+              <div class="au__phone">
+                <span class="au__phone-flag" aria-hidden="true">🇨🇲 +237</span>
+                <input id="au-phone" type="tel" inputmode="tel" autocomplete="tel"
+                  placeholder="6 XX XX XX XX"
+                  [ngModel]="phone()" (ngModelChange)="phone.set($event)" name="phone" />
+              </div>
+            </div>
+
+            <div class="au__field">
+              <label for="au-pw">{{ i18n.locale() === 'fr' ? 'Mot de passe' : 'Password' }}</label>
+              <input id="au-pw" type="password" autocomplete="current-password"
+                [ngModel]="password()" (ngModelChange)="password.set($event)" name="pw" />
+              @if (mode() === 'signin') {
+                <a [routerLink]="'signin' | route" fragment="forgot" class="au__forgot">
+                  {{ i18n.locale() === 'fr' ? 'Mot de passe oublié ?' : 'Forgot password?' }}
+                </a>
+              }
+            </div>
+
+            <button appButton variant="primary" size="lg" [block]="true">
+              @if (mode() === 'signin') {
+                {{ i18n.locale() === 'fr' ? 'Se connecter' : 'Sign in' }}
+              } @else {
+                {{ i18n.locale() === 'fr' ? 'Créer mon compte' : 'Create my account' }}
+              }
+              <app-icon slot="trailing" name="arrow" [size]="18" />
+            </button>
+
+            @if (oauthEnabled) {
+              <div class="au__sep"><span>{{ i18n.locale() === 'fr' ? 'Ou' : 'Or' }}</span></div>
+              <div class="au__oauth">
+                <button type="button" class="au__oauth-btn">Google</button>
+                <button type="button" class="au__oauth-btn">Facebook</button>
+              </div>
+            }
+          </form>
+        }
+
+        @if (otpOpen()) {
+          <h1 class="au__title">{{ i18n.locale() === 'fr' ? 'Vérification' : 'Verification' }}</h1>
+          <p class="au__sub">
+            {{ i18n.locale() === 'fr'
+              ? 'Nous avons envoyé un code à 6 chiffres par SMS au'
+              : 'We sent a 6-digit code via SMS to' }}
+            <strong class="mono">+237 {{ phone() || '6 XX XX XX XX' }}</strong>
+          </p>
+
+          <div class="au__otp">
+            @for (d of otp(); track $index; let i = $index) {
+              <input
+                type="tel"
+                inputmode="numeric"
+                class="otp-box mono"
+                maxlength="1"
+                [value]="d"
+                (input)="onOtpInput(i, $event)"
+                (keydown)="onOtpKeydown(i, $event)"
+                [attr.aria-label]="(i18n.locale() === 'fr' ? 'Chiffre ' : 'Digit ') + (i + 1)"
+              />
+            }
+          </div>
+
+          <button appButton variant="primary" size="lg" [block]="true" (click)="verify()">
+            {{ i18n.locale() === 'fr' ? 'Vérifier' : 'Verify' }}
+            <app-icon slot="trailing" name="check" [size]="18" [strokeWidth]="2.5" />
+          </button>
+
+          <button type="button" class="au__link" (click)="otpOpen.set(false)">
+            <app-icon name="chevron" [size]="14" />
+            {{ i18n.locale() === 'fr' ? 'Modifier mon numéro' : 'Change my number' }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Visual column -->
+    <aside class="au__col au__col--visual" aria-hidden="true">
+      <img
+        src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=80"
+        alt=""
+        loading="lazy"
+      />
+      <div class="au__overlay">
+        <blockquote>
+          <p class="display-italic">{{ i18n.locale() === 'fr' ? "Une maison, c'est bien plus que des murs." : "A home is more than walls." }}</p>
+          <cite>— Proverbe camerounais</cite>
+        </blockquote>
+      </div>
+    </aside>
+  </div>
+</section>

@@ -1,0 +1,84 @@
+@if (open()) {
+  <div class="cp" role="dialog" aria-modal="true" (click)="close()">
+    <div class="cp__backdrop" aria-hidden="true"></div>
+
+    <section
+      class="cp__panel"
+      role="combobox"
+      [attr.aria-expanded]="true"
+      aria-label="Command palette"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Input row -->
+      <header class="cp__input-row">
+        <app-icon name="search" [size]="18" />
+        <input
+          #inputEl
+          type="text"
+          class="cp__input"
+          [ngModel]="query()"
+          (ngModelChange)="onQueryChange($event)"
+          [placeholder]="i18n.locale() === 'fr'
+            ? 'Naviguer, chercher un utilisateur, une annonce, une ville…'
+            : 'Jump to a section, find a user, listing, or city…'"
+          autocomplete="off"
+          spellcheck="false"
+          aria-autocomplete="list"
+          aria-controls="cp-results"
+        />
+        <kbd class="cp__esc">Esc</kbd>
+      </header>
+
+      <!-- Results -->
+      <div class="cp__list" #listEl id="cp-results" role="listbox">
+        @if (grouped().length === 0) {
+          <div class="cp__empty">
+            <app-icon name="search" [size]="28" [strokeWidth]="1.3" />
+            <p>{{ i18n.locale() === 'fr'
+              ? 'Aucun résultat pour « ' + query() + ' ».'
+              : 'No matches for "' + query() + '".' }}</p>
+          </div>
+        }
+        @for (g of grouped(); track g.key) {
+          <section class="cp__group" [attr.aria-labelledby]="groupAriaId(g.key)">
+            <h3 [id]="groupAriaId(g.key)" class="cp__group-title">{{ g.label }}</h3>
+            @for (item of g.items; track item.id) {
+              <button
+                type="button"
+                class="cp__row"
+                role="option"
+                data-cp-row
+                [class.is-selected]="indexFor(item) === selectedIndex()"
+                [attr.aria-selected]="indexFor(item) === selectedIndex()"
+                (click)="select(item)"
+                (mouseenter)="selectedIndex.set(indexFor(item))"
+              >
+                <span class="cp__row-ic" [attr.data-group]="item.group">
+                  <app-icon [name]="item.icon" [size]="16" />
+                </span>
+                <span class="cp__row-text">
+                  <strong>{{ item.label }}</strong>
+                  @if (item.subtitle) {
+                    <small>{{ item.subtitle }}</small>
+                  }
+                </span>
+                @if (item.hint) {
+                  <kbd class="cp__row-hint">{{ item.hint }}</kbd>
+                }
+                <app-icon class="cp__row-arrow" name="arrow" [size]="14" />
+              </button>
+            }
+          </section>
+        }
+      </div>
+
+      <!-- Footer: keyboard hints -->
+      <footer class="cp__foot">
+        <span><kbd>↑</kbd><kbd>↓</kbd> {{ i18n.locale() === 'fr' ? 'naviguer' : 'navigate' }}</span>
+        <span><kbd>↵</kbd> {{ i18n.locale() === 'fr' ? 'ouvrir' : 'open' }}</span>
+        <span><kbd>Esc</kbd> {{ i18n.locale() === 'fr' ? 'fermer' : 'close' }}</span>
+        <span class="cp__foot-brand">Kossimmo · ⌘K</span>
+      </footer>
+    </section>
+  </div>
+}

@@ -1,0 +1,123 @@
+<section class="us">
+  <header class="us__head">
+    <div>
+      <span class="eyebrow">— {{ i18n.locale() === 'fr' ? 'Utilisateurs' : 'Users' }}</span>
+      <h1 class="us__title">{{ counts().total }} {{ i18n.locale() === 'fr' ? 'comptes' : 'accounts' }}</h1>
+    </div>
+
+    <dl class="us__summary">
+      <div>
+        <dt>{{ i18n.locale() === 'fr' ? 'Actifs' : 'Active' }}</dt>
+        <dd class="mono">{{ counts().active }}</dd>
+      </div>
+      <div>
+        <dt>{{ i18n.locale() === 'fr' ? 'En attente' : 'Pending' }}</dt>
+        <dd class="mono">{{ counts().pending }}</dd>
+      </div>
+      <div>
+        <dt>{{ i18n.locale() === 'fr' ? 'Restreints' : 'Restricted' }}</dt>
+        <dd class="mono">{{ counts().suspended }}</dd>
+      </div>
+    </dl>
+  </header>
+
+  <div class="us__toolbar">
+    <div class="us__search">
+      <app-icon name="search" [size]="16" />
+      <input
+        type="search"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+        [placeholder]="i18n.locale() === 'fr' ? 'Nom, email, téléphone, ville…' : 'Name, email, phone, city…'"
+      />
+    </div>
+  </div>
+
+  <div class="us__filters">
+    <div class="us__filter-group">
+      <span>{{ i18n.locale() === 'fr' ? 'Rôle' : 'Role' }}</span>
+      @for (t of typeFilters; track t) {
+        <app-chip [active]="filterType() === t" (clicked)="filterType.set(t)">{{ typeLabel(t) }}</app-chip>
+      }
+    </div>
+    <div class="us__filter-group">
+      <span>{{ i18n.locale() === 'fr' ? 'Statut' : 'Status' }}</span>
+      @for (s of statusFilters; track s) {
+        <app-chip [active]="filterStatus() === s" (clicked)="filterStatus.set(s)">{{ statusLabel(s) }}</app-chip>
+      }
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="us__table-wrap">
+    <table class="us__table">
+      <thead>
+        <tr>
+          <th scope="col">{{ i18n.locale() === 'fr' ? 'Utilisateur' : 'User' }}</th>
+          <th scope="col">{{ i18n.locale() === 'fr' ? 'Rôle' : 'Role' }}</th>
+          <th scope="col">{{ i18n.locale() === 'fr' ? 'Statut' : 'Status' }}</th>
+          <th scope="col" class="us__th-num">{{ i18n.locale() === 'fr' ? 'Annonces' : 'Listings' }}</th>
+          <th scope="col">{{ i18n.locale() === 'fr' ? 'Ville' : 'City' }}</th>
+          <th scope="col">{{ i18n.locale() === 'fr' ? 'Inscrit' : 'Joined' }}</th>
+          <th scope="col" aria-label="Actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of filtered(); track u.id) {
+          <tr>
+            <td class="us__user">
+              <app-monogram [name]="u.name" style="--mono-size: 36px;" />
+              <div>
+                <strong>{{ u.name }}</strong>
+                <span>{{ u.email }} · {{ u.phone }}</span>
+              </div>
+            </td>
+            <td>
+              <app-badge [tone]="u.type === 'admin' ? 'forest' : u.type === 'agent' ? 'accent' : 'neutral'">
+                {{ typeLabel(u.type) }}
+              </app-badge>
+            </td>
+            <td>
+              <span class="us__status" [attr.data-status]="u.status">
+                <span class="us__dot" aria-hidden="true"></span>
+                {{ statusLabel(u.status) }}
+              </span>
+            </td>
+            <td class="us__num mono">{{ u.listings }}</td>
+            <td>{{ u.city }}</td>
+            <td class="us__num">{{ u.joinedAt }}</td>
+            <td class="us__row-actions">
+              <button type="button" class="us__dots" (click)="toggleMenu(u.id)" [attr.aria-expanded]="openMenuFor() === u.id">⋯</button>
+              @if (openMenuFor() === u.id) {
+                <div class="us__menu" role="menu">
+                  @if (u.status !== 'active') {
+                    <button type="button" (click)="updateStatus(u.id, 'active')">
+                      <app-icon name="check" [size]="14" /> {{ i18n.locale() === 'fr' ? 'Activer' : 'Activate' }}
+                    </button>
+                  }
+                  @if (u.status === 'active') {
+                    <button type="button" (click)="updateStatus(u.id, 'suspended')">
+                      <app-icon name="shield" [size]="14" /> {{ i18n.locale() === 'fr' ? 'Suspendre' : 'Suspend' }}
+                    </button>
+                  }
+                  @if (u.status !== 'banned') {
+                    <button type="button" class="us__menu-danger" (click)="updateStatus(u.id, 'banned')">
+                      <app-icon name="close" [size]="14" /> {{ i18n.locale() === 'fr' ? 'Bannir' : 'Ban' }}
+                    </button>
+                  }
+                </div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (filtered().length === 0) {
+      <div class="us__empty">
+        <app-icon name="user" [size]="32" [strokeWidth]="1.3" />
+        <p class="muted">{{ i18n.locale() === 'fr' ? 'Aucun utilisateur correspondant.' : 'No matching users.' }}</p>
+      </div>
+    }
+  </div>
+</section>

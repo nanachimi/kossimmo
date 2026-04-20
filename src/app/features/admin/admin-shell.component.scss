@@ -1,0 +1,343 @@
+:host { display: block; }
+
+.ad {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100vh;
+  background: var(--surface-inset);
+
+  @media (min-width: 960px) {
+    grid-template-columns: 18rem 1fr;
+  }
+}
+
+// ─── Sidebar ─────────────────────────────────────────────
+// Admin owns the viewport — sidebar pins from the very top.
+.ad__sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 18rem;
+  padding: var(--space-5) var(--space-4);
+  background: var(--ink);
+  color: var(--paper);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  transform: translateX(-100%);
+  transition: transform var(--dur-md) var(--ease-out);
+  z-index: var(--z-overlay);
+  overflow-y: auto;
+
+  .ad--drawer-open & { transform: translateX(0); }
+
+  @media (min-width: 960px) {
+    position: sticky;
+    transform: none !important;
+    height: 100vh;
+    top: 0;
+  }
+}
+
+.ad__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--paper);
+  text-decoration: none;
+}
+
+.ad__brand-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-display);
+}
+
+.ad__brand-tag {
+  padding: 0.15rem 0.45rem;
+  background: rgba(255, 78, 26, 0.25);
+  color: var(--accent);
+  border: 1px solid rgba(255, 78, 26, 0.4);
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: auto;
+}
+
+// ─── Nav ────────────────────────────────────────────────
+.ad__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.ad__nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.9rem;
+  color: rgba(250, 250, 247, 0.7);
+  border-radius: var(--radius-sm);
+  font-size: var(--step--1);
+  font-weight: 500;
+  transition:
+    background-color var(--dur-sm) var(--ease-out),
+    color var(--dur-sm) var(--ease-out);
+
+  &:hover {
+    background: rgba(250, 250, 247, 0.06);
+    color: var(--paper);
+  }
+
+  &.is-active {
+    background: rgba(255, 78, 26, 0.14);
+    color: var(--paper);
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: -1rem;
+      top: 20%;
+      bottom: 20%;
+      width: 3px;
+      background: var(--accent);
+      border-radius: 0 3px 3px 0;
+    }
+  }
+
+  app-icon { flex-shrink: 0; }
+  span:first-of-type { flex: 1; }
+}
+
+.ad__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+// ─── Footer block ───────────────────────────────────────
+.ad__foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(250, 250, 247, 0.1);
+}
+
+.ad__who {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  align-items: center;
+
+  strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-weight: 500;
+    color: var(--paper);
+    line-height: 1.1;
+  }
+
+  span {
+    font-size: var(--step--2);
+    color: rgba(250, 250, 247, 0.55);
+  }
+}
+
+.ad__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.ad__exit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  font-size: var(--step--2);
+  color: rgba(250, 250, 247, 0.65);
+  border-radius: var(--radius-xs);
+  transition: color var(--dur-sm) var(--ease-out),
+    background-color var(--dur-sm) var(--ease-out);
+
+  app-icon { transform: rotate(180deg); }
+
+  &:hover {
+    color: var(--paper);
+    background: rgba(250, 250, 247, 0.06);
+  }
+}
+
+// ─── Main pane ──────────────────────────────────────────
+.ad__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+.ad__topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  background: rgba(250, 250, 247, 0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-strong);
+  // Warm shadow — gives a clear "floor" to the topbar even on scroll,
+  // so content below doesn't feel glued to the chrome.
+  box-shadow: 0 2px 0 rgba(10, 10, 10, 0.02), 0 6px 16px rgba(10, 10, 10, 0.04);
+}
+
+.ad__burger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+
+  @media (min-width: 960px) { display: none; }
+}
+
+// Topbar trigger — styled like a search field but it's a button
+// that opens the Cmd+K command palette. The ⌘K hint on the right
+// teaches the shortcut on every visit.
+.ad__search-trigger {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.7rem 0.5rem 0.9rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  max-width: 34rem;
+  color: var(--text-muted);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--dur-sm) var(--ease-out),
+    background-color var(--dur-sm) var(--ease-out),
+    box-shadow var(--dur-sm) var(--ease-out),
+    color var(--dur-sm) var(--ease-out);
+
+  app-icon { color: var(--text-muted); }
+
+  &:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-inset);
+    color: var(--ink-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--ochre);
+    box-shadow: var(--shadow-focus);
+  }
+}
+
+.ad__search-label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--step--1);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ad__search-kbd {
+  display: inline-flex;
+  gap: 0.2rem;
+  flex-shrink: 0;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface-inset);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    line-height: 1;
+  }
+}
+
+.ad__topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ad__topbar-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  font-size: var(--step--2);
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.ad__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  animation: pulseDot 2s var(--ease-in-out) infinite;
+}
+
+.ad__content {
+  padding: var(--space-6) var(--space-5);
+
+  @media (min-width: 1200px) {
+    padding: var(--space-6) var(--space-8);
+  }
+}
+
+.ad__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.45);
+  z-index: calc(var(--z-overlay) - 1);
+
+  @media (min-width: 960px) { display: none; }
+}

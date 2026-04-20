@@ -1,0 +1,86 @@
+<a
+  class="pc"
+  [routerLink]="[('property' | route), property.slug]"
+  [attr.aria-label]="property.title[locale]"
+>
+  <figure class="pc__media">
+    <img
+      [src]="property.photos[0].url"
+      [alt]="property.photos[0].alt"
+      loading="lazy"
+      decoding="async"
+    />
+    <span class="pc__vignette" aria-hidden="true"></span>
+
+    <div class="pc__media-top">
+      <div class="pc__badges">
+        <app-badge tone="paper">{{ property.mode === 'rent' ? ('common.forRent' | t) : ('common.forSale' | t) }}</app-badge>
+        @if (property.verified) {
+          <app-badge tone="forest" icon="shield">{{ 'common.verified' | t }}</app-badge>
+        }
+      </div>
+      <button
+        type="button"
+        class="pc__fav"
+        [class.is-saved]="saved()"
+        (click)="toggleSaved($event)"
+        [attr.aria-label]="'common.save' | t"
+      >
+        <app-icon name="heart" [size]="18" [strokeWidth]="saved() ? 0 : 1.75" />
+      </button>
+    </div>
+
+    <div class="pc__media-bottom">
+      <button
+        type="button"
+        class="pc__wa"
+        (click)="openWhatsApp($event)"
+        [attr.aria-label]="'common.whatsapp' | t"
+      >
+        <app-icon name="whatsapp" [size]="16" />
+        <span>WhatsApp</span>
+      </button>
+    </div>
+  </figure>
+
+  <div class="pc__body">
+    <header class="pc__header">
+      <span class="pc__city"><app-icon name="pin" [size]="13" /> {{ property.location.neighborhood }}, {{ property.location.city }}</span>
+      <h3 class="pc__title">{{ property.title[locale] }}</h3>
+    </header>
+
+    <ul class="pc__specs">
+      @if (property.bedrooms > 0) {
+        <li><app-icon name="bed" [size]="16" /> {{ property.bedrooms }} {{ 'common.bedrooms' | t }}</li>
+      }
+      @if (property.bathrooms > 0) {
+        <li><app-icon name="bath" [size]="16" /> {{ property.bathrooms }} {{ 'common.bathrooms' | t }}</li>
+      }
+      @if (property.livingArea > 0) {
+        <li><app-icon name="ruler" [size]="16" /> {{ property.livingArea }} {{ 'common.area' | t }}</li>
+      } @else if (property.landArea) {
+        <li><app-icon name="leaf" [size]="16" /> {{ property.landArea }} {{ 'common.area' | t }}</li>
+      }
+    </ul>
+
+    <div class="pc__infra">
+      @if (property.infrastructure.generator || property.infrastructure.power === 'grid_generator') {
+        <span class="pc__infra-chip" title="Générateur"><app-icon name="bolt" [size]="13" /></span>
+      }
+      @if (property.infrastructure.tank) {
+        <span class="pc__infra-chip" title="Tank d'eau"><app-icon name="droplet" [size]="13" /></span>
+      }
+      @if (property.infrastructure.security === 'gated' || property.infrastructure.security === 'guarded') {
+        <span class="pc__infra-chip" title="Sécurité"><app-icon name="shield" [size]="13" /></span>
+      }
+      @if (property.infrastructure.road === 'paved') {
+        <span class="pc__infra-chip" title="Route pavée"><app-icon name="road" [size]="13" /></span>
+      }
+    </div>
+
+    <footer class="pc__footer">
+      <span class="pc__price mono">{{ property.price | xaf }}</span>
+      <span class="pc__arrow"><app-icon name="arrow" [size]="18" /></span>
+    </footer>
+  </div>
+</a>

@@ -1,0 +1,98 @@
+<div class="ad" [class.ad--drawer-open]="drawerOpen()">
+  <!--
+    Palette declared at the top so template-variable references from
+    the topbar button resolve during Angular's strict template
+    type-check (forward refs aren't hoisted).
+  -->
+  <app-command-palette />
+
+  <!-- Sidebar -->
+  <aside class="ad__sidebar" aria-label="Admin navigation">
+    <a routerLink="/" class="ad__brand">
+      <svg viewBox="0 0 32 32" width="26" height="26" fill="none" aria-hidden="true">
+        <path d="M4 28 L4 14.5 L16 4 L28 14.5 L28 28 Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M13.5 28 V22 C13.5 20.5 14.6 19.5 16 19.5 C17.4 19.5 18.5 20.5 18.5 22 V28 Z" fill="#ff4e1a"/>
+      </svg>
+      <span class="ad__brand-name">Kossimmo</span>
+      <span class="ad__brand-tag">Admin</span>
+    </a>
+
+    <nav class="ad__nav" aria-label="Sections">
+      @for (item of nav; track item.path) {
+        <a
+          [routerLink]="item.path"
+          [routerLinkActiveOptions]="{ exact: item.path === '/backoffice' }"
+          routerLinkActive="is-active"
+          class="ad__nav-link"
+          (click)="closeDrawer()"
+        >
+          <app-icon [name]="item.icon" [size]="18" />
+          <span>{{ item.label[i18n.locale()] }}</span>
+          @if (item.badge) {
+            <span class="ad__badge">{{ item.badge }}</span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="ad__foot">
+      <div class="ad__who">
+        <div class="ad__avatar" aria-hidden="true">SB</div>
+        <div>
+          <strong>Sarah Biya</strong>
+          <span>Admin · Douala</span>
+        </div>
+      </div>
+      <a routerLink="/" class="ad__exit">
+        <app-icon name="arrow" [size]="14" />
+        <span>{{ i18n.locale() === 'fr' ? 'Retour au site' : 'Back to site' }}</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main pane -->
+  <div class="ad__main">
+    <header class="ad__topbar">
+      <button
+        type="button"
+        class="ad__burger"
+        (click)="toggleDrawer()"
+        [attr.aria-expanded]="drawerOpen()"
+        aria-label="Toggle menu"
+      >
+        <app-icon [name]="drawerOpen() ? 'close' : 'menu'" [size]="20" />
+      </button>
+
+      <button
+        type="button"
+        class="ad__search-trigger"
+        (click)="openPalette()"
+        [attr.aria-label]="i18n.locale() === 'fr' ? 'Ouvrir la palette de commandes' : 'Open command palette'"
+      >
+        <app-icon name="search" [size]="16" />
+        <span class="ad__search-label">
+          {{ i18n.locale() === 'fr' ? 'Naviguer, chercher…' : 'Jump to, search…' }}
+        </span>
+        <kbd class="ad__search-kbd">
+          <span>⌘</span><span>K</span>
+        </kbd>
+      </button>
+
+      <div class="ad__topbar-actions">
+        <span class="ad__topbar-pill">
+          <span class="ad__dot" aria-hidden="true"></span>
+          {{ i18n.locale() === 'fr' ? 'En ligne' : 'Online' }}
+        </span>
+        <app-badge tone="accent">v1.0 · beta</app-badge>
+      </div>
+    </header>
+
+    <section class="ad__content">
+      <router-outlet />
+    </section>
+  </div>
+
+  @if (drawerOpen()) {
+    <div class="ad__backdrop" (click)="closeDrawer()" aria-hidden="true"></div>
+  }
+</div>

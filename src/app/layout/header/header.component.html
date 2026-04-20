@@ -1,0 +1,107 @@
+<header class="hd" [class.hd--scrolled]="scrolled()" [class.hd--open]="mobileOpen()">
+  <div class="container hd__inner">
+    <a routerLink="/" class="hd__brand" (click)="closeMobile()">
+      <span class="hd__brand-mark" aria-hidden="true">
+        <!--
+          Kossimmo mark — geometric house silhouette: rectangular walls,
+          pitched roof, and an arched doorway in the accent color.
+        -->
+        <svg viewBox="0 0 32 32" width="30" height="30" fill="none">
+          <path
+            d="M4 28 L4 14.5 L16 4 L28 14.5 L28 28 Z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M13.5 28 V22 C13.5 20.5 14.6 19.5 16 19.5 C17.4 19.5 18.5 20.5 18.5 22 V28 Z"
+            fill="#ff4e1a"
+          />
+        </svg>
+      </span>
+      <span class="hd__brand-name">{{ 'brand.name' | t }}</span>
+    </a>
+
+    <nav class="hd__nav" [attr.aria-label]="'Primary'">
+      <a [routerLink]="'rent' | route" routerLinkActive="is-active" class="hd__link">
+        <span>{{ 'nav.rent' | t }}</span>
+        <svg class="underline" viewBox="0 0 80 8" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M2 5 Q 20 1, 40 4 T 78 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </a>
+      <a [routerLink]="'buy' | route" routerLinkActive="is-active" class="hd__link">
+        <span>{{ 'nav.buy' | t }}</span>
+        <svg class="underline" viewBox="0 0 80 8" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M2 5 Q 20 1, 40 4 T 78 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </a>
+      <a [routerLink]="'land' | route" routerLinkActive="is-active" class="hd__link">
+        <span>{{ 'nav.land' | t }}</span>
+        <svg class="underline" viewBox="0 0 80 8" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M2 5 Q 20 1, 40 4 T 78 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </a>
+      <a [routerLink]="'agents' | route" routerLinkActive="is-active" class="hd__link">
+        <span>{{ 'nav.agents' | t }}</span>
+        <svg class="underline" viewBox="0 0 80 8" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M2 5 Q 20 1, 40 4 T 78 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </a>
+    </nav>
+
+    <div class="hd__actions">
+      <div class="hd__lang" role="group" aria-label="Language">
+        <button
+          type="button"
+          class="hd__lang-btn"
+          [class.is-active]="i18n.locale() === 'fr'"
+          (click)="switchLocale('fr')"
+          aria-label="Français"
+        >FR</button>
+        <span class="hd__lang-sep" aria-hidden="true">·</span>
+        <button
+          type="button"
+          class="hd__lang-btn"
+          [class.is-active]="i18n.locale() === 'en'"
+          (click)="switchLocale('en')"
+          aria-label="English"
+        >EN</button>
+      </div>
+
+      <a [routerLink]="'signin' | route" class="hd__signin">
+        {{ 'nav.signIn' | t }}
+      </a>
+
+      <a appButton variant="primary" size="sm" [routerLink]="'list' | route">
+        {{ 'nav.list' | t }}
+      </a>
+
+      <button
+        type="button"
+        class="hd__burger"
+        (click)="toggleMobile()"
+        [attr.aria-expanded]="mobileOpen()"
+        [attr.aria-label]="mobileOpen() ? 'Close menu' : 'Open menu'"
+      >
+        <app-icon [name]="mobileOpen() ? 'close' : 'menu'" [size]="22" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div class="hd__drawer" [attr.aria-hidden]="!mobileOpen()">
+    <a [routerLink]="'rent' | route" (click)="closeMobile()" class="hd__drawer-link">{{ 'nav.rent' | t }}</a>
+    <a [routerLink]="'buy' | route" (click)="closeMobile()" class="hd__drawer-link">{{ 'nav.buy' | t }}</a>
+    <a [routerLink]="'land' | route" (click)="closeMobile()" class="hd__drawer-link">{{ 'nav.land' | t }}</a>
+    <a [routerLink]="'agents' | route" (click)="closeMobile()" class="hd__drawer-link">{{ 'nav.agents' | t }}</a>
+    <hr class="hairline" />
+    <a [routerLink]="'signin' | route" (click)="closeMobile()" class="hd__drawer-link">{{ 'nav.signIn' | t }}</a>
+    <a appButton variant="primary" size="md" [block]="true" [routerLink]="'list' | route" (click)="closeMobile()">
+      {{ 'nav.list' | t }}
+    </a>
+    <div class="hd__drawer-lang">
+      <button (click)="switchLocale('fr')" [class.is-active]="i18n.locale() === 'fr'">FR — Français</button>
+      <button (click)="switchLocale('en')" [class.is-active]="i18n.locale() === 'en'">EN — English</button>
+    </div>
+  </div>
+</header>

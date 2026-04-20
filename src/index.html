@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Kossimmo — L'immobilier au Cameroun, réinventé.</title>
+  <base href="/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Kossimmo — plateforme immobilière pensée pour le Cameroun. Douala, Yaoundé, Bafoussam. Location, vente, terrains. WhatsApp intégré." />
+  <meta name="theme-color" content="#fafaf7" />
+  <meta property="og:title" content="Kossimmo — L'immobilier au Cameroun" />
+  <meta property="og:description" content="Des compounds de Bastos aux studios d'Akwa — trouvez chez vous, en FR ou EN." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+
+  <!-- Critical inline CSS — prevents FOUC on cold load -->
+  <style>
+    html, body { margin: 0; padding: 0; background: #fafaf7; color: #0a0a0a; }
+    body {
+      font-family: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    app-root { display: block; min-height: 100vh; }
+    .lp-preboot {
+      position: fixed; inset: 0; display: grid; place-items: center;
+      background: #fafaf7; z-index: 9999;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: 2.25rem; font-weight: 600; letter-spacing: -0.04em; color: #0a0a0a;
+      animation: fadeOut 0.6s 0.3s forwards;
+    }
+    @keyframes fadeOut { to { opacity: 0; pointer-events: none; visibility: hidden; } }
+  </style>
+</head>
+<body>
+  <div class="lp-preboot" aria-hidden="true">Kossimmo</div>
+  <app-root></app-root>
+</body>
+</html>

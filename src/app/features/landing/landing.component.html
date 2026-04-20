@@ -1,0 +1,254 @@
+<div #revealRoot class="lp">
+  <!-- ═══════════════ HERO ═══════════════ -->
+  <section class="lp-hero" aria-labelledby="hero-title">
+    <!-- Soft ambient orb that drifts behind the content -->
+    <span class="lp-hero__orb lp-hero__orb--a" aria-hidden="true"></span>
+    <span class="lp-hero__orb lp-hero__orb--b" aria-hidden="true"></span>
+
+    <div class="container lp-hero__grid">
+      <div class="lp-hero__copy">
+        <span class="eyebrow lp-hero__eyebrow hero-in" style="--hero-i: 0">{{ 'hero.eyebrow' | t }}</span>
+
+        <h1 id="hero-title" class="lp-hero__title">
+          <span class="line"><span class="line-inner hero-in" style="--hero-i: 1">{{ 'hero.title.1' | t }}</span></span>
+          <span class="line"><span class="line-inner hero-in line-italic" style="--hero-i: 2">{{ 'hero.title.2' | t }}</span></span>
+          <span class="line"><span class="line-inner hero-in" style="--hero-i: 3">{{ 'hero.title.3' | t }}</span></span>
+        </h1>
+
+        <p class="lp-hero__sub hero-in" style="--hero-i: 4">{{ 'hero.subtitle' | t }}</p>
+
+        <form class="lp-hero__search hero-in" style="--hero-i: 5" (submit)="$event.preventDefault()" role="search">
+          <div class="lp-hero__field lp-hero__field--loc">
+            <app-input
+              [label]="'hero.search.location' | t"
+              leadingIcon="pin"
+              placeholder="Douala, Bonanjo…"
+              type="search"
+            />
+          </div>
+          <div class="lp-hero__field">
+            <app-input
+              [label]="'hero.search.type' | t"
+              leadingIcon="home"
+              [placeholder]="('categories.apartment' | t) + ' · ' + ('categories.house' | t)"
+            />
+          </div>
+          <div class="lp-hero__field">
+            <app-input
+              [label]="'hero.search.price' | t"
+              leadingIcon="sparkles"
+              placeholder="0 – 2 000 000 FCFA"
+              inputMode="numeric"
+            />
+          </div>
+          <button appButton variant="primary" size="lg" class="lp-hero__cta">
+            <app-icon slot="leading" name="search" [size]="18" />
+            {{ 'hero.search.cta' | t }}
+          </button>
+        </form>
+
+        <ul class="lp-hero__stats hero-in" style="--hero-i: 6" role="list">
+          <li>
+            <strong class="mono">{{ statListings() | number:'1.0-0' }}</strong>
+            <span>{{ 'hero.stats.listings' | t }}</span>
+          </li>
+          <li>
+            <strong class="mono">{{ statAgents() }}</strong>
+            <span>{{ 'hero.stats.agents' | t }}</span>
+          </li>
+          <li>
+            <strong class="mono">{{ statCities() }}</strong>
+            <span>{{ 'hero.stats.cities' | t }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <figure class="lp-hero__figure hero-in hero-in--right" style="--hero-i: 2">
+        <div class="lp-hero__figure-inner" [style.transform]="'translateY(' + (heroScrollY() * -0.08) + 'px)'">
+          <img
+            src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=80"
+            alt="Villa moderne à Douala"
+            loading="eager"
+            decoding="async"
+            [style.transform]="'scale(' + (1.05 + heroScrollY() * 0.0004) + ')'"
+          />
+        </div>
+        <div class="lp-hero__badge hero-float" style="--hero-i: 5">
+          <app-badge tone="paper" icon="shield">{{ 'common.verified' | t }}</app-badge>
+        </div>
+        <div class="lp-hero__pill hero-float" style="--hero-i: 6">
+          <span class="lp-hero__pill-eyebrow">Bonanjo · Douala</span>
+          <span class="lp-hero__pill-price mono">1 800 000 FCFA / {{ i18n.locale() === 'fr' ? 'mois' : 'month' }}</span>
+        </div>
+        <div class="lp-hero__chip hero-float" style="--hero-i: 7">
+          <span class="pulse" aria-hidden="true"></span>
+          {{ i18n.locale() === 'fr' ? '12 nouvelles annonces aujourd\'hui' : '12 new listings today' }}
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ═══════════════ CATEGORIES ═══════════════ -->
+  <section class="lp-cats" aria-labelledby="cats-title">
+    <div class="container">
+      <header class="lp-cats__head" data-reveal>
+        <span class="eyebrow">— {{ 'categories.title' | t }}</span>
+        <h2 id="cats-title" class="display">{{ 'categories.subtitle' | t }}</h2>
+      </header>
+      <div class="lp-cats__grid" data-reveal>
+        @for (c of categories; track c.key; let i = $index) {
+          <button
+            type="button"
+            class="lp-cat"
+            [class.is-active]="activeCategory() === c.key"
+            [style.--reveal-i]="i"
+            (click)="setCategory(c.key)"
+          >
+            <span class="lp-cat__ic"><app-icon [name]="c.icon" [size]="26" [strokeWidth]="1.5" /></span>
+            <span class="lp-cat__lbl">{{ ('categories.' + c.key) | t }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ FEATURED LISTINGS ═══════════════ -->
+  <section class="lp-feat" aria-labelledby="feat-title">
+    <div class="container">
+      <header class="lp-feat__head" data-reveal>
+        <div>
+          <span class="eyebrow">— {{ 'featured.title' | t }}</span>
+          <h2 id="feat-title" class="display lp-feat__title">
+            {{ i18n.locale() === 'fr' ? 'Nouveautés à Douala, Yaoundé' : 'New in Douala, Yaoundé' }}
+            <span class="display-italic"> &amp; Bafoussam</span>
+          </h2>
+          <p class="muted lp-feat__sub">{{ 'featured.subtitle' | t }}</p>
+        </div>
+        <a [routerLink]="'rent' | route" class="lp-feat__all">
+          <span>{{ i18n.locale() === 'fr' ? 'Tout voir' : 'See all' }}</span>
+          <app-icon name="arrow" [size]="18" />
+        </a>
+      </header>
+
+      <div class="lp-feat__slider" data-reveal>
+        <div class="lp-feat__track">
+          @for (p of featured; track p.id; let i = $index) {
+            <div class="lp-feat__slide" [style.--reveal-i]="i">
+              <app-property-card [property]="p" [locale]="i18n.locale()" />
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="lp-feat__cities" data-reveal>
+        @for (c of cities; track c.name; let i = $index) {
+          <a class="lp-city" [style.--reveal-i]="i" [routerLink]="'rent' | route" [queryParams]="{ city: c.name }">
+            <div class="lp-city__img" [style.--bg]="'url(' + c.image + ')'">
+              <span class="lp-city__count mono">{{ c.listings }} {{ 'featured.city.count' | t }}</span>
+            </div>
+            <div class="lp-city__meta">
+              <h3>{{ c.name }}</h3>
+              <span>{{ c.tagline[i18n.locale()] }}</span>
+            </div>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ TRUST ═══════════════ -->
+  <section class="lp-trust grain" aria-labelledby="trust-title">
+    <div class="container lp-trust__grid">
+      <header class="lp-trust__head" data-reveal>
+        <span class="eyebrow">— {{ 'trust.eyebrow' | t }}</span>
+        <h2 id="trust-title" class="lp-trust__title">
+          <span>{{ i18n.locale() === 'fr' ? 'Bâti pour le' : 'Built for' }}</span>
+          <span class="display-italic">&nbsp;Cameroun,</span><br/>
+          <span>{{ i18n.locale() === 'fr' ? 'pensé pour vous.' : 'designed for you.' }}</span>
+        </h2>
+        <p class="muted lp-trust__lede">
+          {{ i18n.locale() === 'fr'
+            ? 'Une plateforme qui tient compte des réalités locales : WhatsApp, générateurs, titres fonciers, connexions 3G.'
+            : 'A platform that respects local realities: WhatsApp, generators, land titles, 3G connections.' }}
+        </p>
+      </header>
+
+      <div class="lp-trust__cards">
+        <article class="lp-trust__card lp-trust__card--whatsapp" data-reveal style="--reveal-i: 0">
+          <app-icon name="whatsapp" [size]="28" />
+          <h3>{{ 'trust.whatsapp.title' | t }}</h3>
+          <p>{{ 'trust.whatsapp.body' | t }}</p>
+        </article>
+        <article class="lp-trust__card" data-reveal style="--reveal-i: 1">
+          <app-icon name="shield" [size]="28" />
+          <h3>{{ 'trust.verified.title' | t }}</h3>
+          <p>{{ 'trust.verified.body' | t }}</p>
+        </article>
+        <article class="lp-trust__card" data-reveal style="--reveal-i: 2">
+          <app-icon name="droplet" [size]="28" />
+          <h3>{{ 'trust.infra.title' | t }}</h3>
+          <p>{{ 'trust.infra.body' | t }}</p>
+        </article>
+        <article class="lp-trust__card" data-reveal style="--reveal-i: 3">
+          <app-icon name="globe" [size]="28" />
+          <h3>{{ 'trust.offline.title' | t }}</h3>
+          <p>{{ 'trust.offline.body' | t }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ JOURNAL ═══════════════ -->
+  <section class="lp-jrn" aria-labelledby="jrn-title">
+    <div class="container">
+      <header class="lp-jrn__head" data-reveal>
+        <div>
+          <span class="eyebrow">— {{ 'editorial.eyebrow' | t }}</span>
+          <h2 id="jrn-title" class="display">{{ 'editorial.title' | t }}</h2>
+        </div>
+        <a [routerLink]="'journal' | route" class="lp-jrn__all">
+          {{ 'editorial.cta' | t }}
+          <app-icon name="arrow" [size]="18" />
+        </a>
+      </header>
+
+      <div class="lp-jrn__grid">
+        @for (j of journal; track j.title.fr; let i = $index) {
+          <article class="lp-jrn__item" data-reveal [style.--reveal-i]="i">
+            <div class="lp-jrn__img" [style.--bg]="'url(' + j.image + ')'"></div>
+            <div class="lp-jrn__meta">
+              <span class="lp-jrn__tag">{{ j.tag[i18n.locale()] }}</span>
+              <h3>{{ j.title[i18n.locale()] }}</h3>
+              <span class="lp-jrn__read">{{ 'editorial.read' | t }} <app-icon name="arrow" [size]="14" /></span>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ CTA BAND ═══════════════ -->
+  <section class="lp-cta" aria-labelledby="cta-title">
+    <div class="container lp-cta__inner" data-reveal>
+      <div>
+        <span class="eyebrow">— {{ i18n.locale() === 'fr' ? 'Propriétaire ?' : 'Owner?' }}</span>
+        <h2 id="cta-title" class="lp-cta__title">
+          {{ i18n.locale() === 'fr' ? 'Publiez votre bien' : 'List your property' }}
+          <span class="display-italic">
+            {{ i18n.locale() === 'fr' ? ' gratuitement.' : ' for free.' }}
+          </span>
+        </h2>
+        <p class="lp-cta__sub">{{ 'footer.free' | t }}</p>
+      </div>
+      <div class="lp-cta__actions">
+        <a appButton variant="primary" size="lg" [routerLink]="'list' | route">
+          {{ 'nav.list' | t }}
+          <app-icon slot="trailing" name="arrow" [size]="18" />
+        </a>
+        <a appButton variant="secondary" size="lg" [routerLink]="'agents' | route">
+          {{ i18n.locale() === 'fr' ? 'Devenir agent' : 'Become an agent' }}
+        </a>
+      </div>
+    </div>
+  </section>
+</div>

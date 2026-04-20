@@ -1,0 +1,173 @@
+<section class="sr">
+  <!-- ─── Header ────────────────────────────────────────────────── -->
+  <header class="sr__head container">
+    <div class="sr__headline">
+      <span class="eyebrow">— {{ preset() === 'rent' ? 'Louer' : preset() === 'buy' ? 'Acheter' : 'Terrains' }}</span>
+      <h1 class="sr__title">{{ headline() }}</h1>
+      <p class="muted">{{ subhead() }}</p>
+    </div>
+    <div class="sr__quick">
+      <button type="button" class="sr__fbtn" (click)="toggleFilters()">
+        <app-icon name="menu" [size]="18" />
+        <span>{{ i18n.locale() === 'fr' ? 'Filtres' : 'Filters' }}</span>
+        @if (activeFilterCount() > 0) {
+          <span class="sr__fcount">{{ activeFilterCount() }}</span>
+        }
+      </button>
+
+      <div class="sr__sort">
+        <label class="sr-only" for="sort-sel">{{ i18n.locale() === 'fr' ? 'Trier' : 'Sort' }}</label>
+        <select id="sort-sel" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
+          <option value="newest">{{ i18n.locale() === 'fr' ? 'Plus récent' : 'Newest' }}</option>
+          <option value="price_asc">{{ i18n.locale() === 'fr' ? 'Prix ↑' : 'Price ↑' }}</option>
+          <option value="price_desc">{{ i18n.locale() === 'fr' ? 'Prix ↓' : 'Price ↓' }}</option>
+          <option value="area_desc">{{ i18n.locale() === 'fr' ? 'Surface ↓' : 'Area ↓' }}</option>
+        </select>
+        <app-icon name="chevronDown" [size]="16" />
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Active filter chips ─────────────────────────────────── -->
+  @if (activeFilterCount() > 0) {
+    <div class="sr__chips container">
+      @if (selectedCity()) {
+        <app-chip icon="pin" [active]="true" (clicked)="selectedCity.set(null)">{{ selectedCity() }}</app-chip>
+      }
+      @if (selectedType()) {
+        <app-chip icon="home" [active]="true" (clicked)="selectedType.set(null)">{{ ('categories.' + (selectedType() === 'servants_quarters' ? 'sq' : selectedType())) | t }}</app-chip>
+      }
+      <!-- (keeps 'sq' as the short key for servants_quarters to preserve the i18n label) -->
+      @if (minBeds() != null) {
+        <app-chip icon="bed" [active]="true" (clicked)="minBeds.set(null)">{{ minBeds() }}+ {{ 'common.bedrooms' | t }}</app-chip>
+      }
+      @if (onlyVerified()) {
+        <app-chip icon="shield" [active]="true" (clicked)="onlyVerified.set(false)">{{ 'common.verified' | t }}</app-chip>
+      }
+      @if (onlyFurnished()) {
+        <app-chip icon="sparkles" [active]="true" (clicked)="onlyFurnished.set(false)">{{ i18n.locale() === 'fr' ? 'Meublé' : 'Furnished' }}</app-chip>
+      }
+      @if (onlyGenerator()) {
+        <app-chip icon="bolt" [active]="true" (clicked)="onlyGenerator.set(false)">{{ i18n.locale() === 'fr' ? 'Générateur' : 'Generator' }}</app-chip>
+      }
+      @if (onlySecurity()) {
+        <app-chip icon="shield" [active]="true" (clicked)="onlySecurity.set(false)">{{ i18n.locale() === 'fr' ? 'Sécurité 24/7' : '24/7 security' }}</app-chip>
+      }
+      <button type="button" class="sr__reset" (click)="reset()">{{ i18n.locale() === 'fr' ? 'Tout effacer' : 'Clear all' }}</button>
+    </div>
+  }
+
+  <div class="sr__layout container">
+    <!-- ─── Filter sidebar / drawer ─────────────────────────── -->
+    <aside class="sr__filters" [class.is-open]="filtersOpen()" aria-label="Filters">
+      <header class="sr__filters-head">
+        <h2>{{ i18n.locale() === 'fr' ? 'Filtres' : 'Filters' }}</h2>
+        <button type="button" class="sr__close" (click)="toggleFilters()" aria-label="Close">
+          <app-icon name="close" [size]="20" />
+        </button>
+      </header>
+
+      <!-- City -->
+      <div class="sr__group">
+        <h3>{{ i18n.locale() === 'fr' ? 'Ville' : 'City' }}</h3>
+        <div class="sr__chipset">
+          @for (c of cities; track c) {
+            <app-chip [active]="selectedCity() === c" (clicked)="selectedCity.set(selectedCity() === c ? null : c)">{{ c }}</app-chip>
+          }
+        </div>
+      </div>
+
+      <!-- Type -->
+      <div class="sr__group">
+        <h3>{{ i18n.locale() === 'fr' ? 'Type de bien' : 'Type' }}</h3>
+        <div class="sr__chipset">
+          @for (t of typeOptions; track t) {
+            <app-chip [active]="selectedType() === t" (clicked)="selectedType.set(selectedType() === t ? null : t)">
+              {{ ('categories.' + (t === 'servants_quarters' ? 'sq' : t)) | t }}
+            </app-chip>
+          }
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="sr__group">
+        <h3>{{ i18n.locale() === 'fr' ? 'Budget (FCFA)' : 'Budget (XAF)' }}</h3>
+        <div class="sr__range">
+          <input type="number" inputmode="numeric" placeholder="Min" [ngModel]="minPrice()" (ngModelChange)="minPrice.set($event ? +$event : null)" />
+          <span aria-hidden="true">—</span>
+          <input type="number" inputmode="numeric" placeholder="Max" [ngModel]="maxPrice()" (ngModelChange)="maxPrice.set($event ? +$event : null)" />
+        </div>
+      </div>
+
+      <!-- Bedrooms -->
+      <div class="sr__group">
+        <h3>{{ i18n.locale() === 'fr' ? 'Chambres (min)' : 'Min bedrooms' }}</h3>
+        <div class="sr__chipset">
+          @for (n of [1,2,3,4,5]; track n) {
+            <app-chip [active]="minBeds() === n" (clicked)="minBeds.set(minBeds() === n ? null : n)">{{ n }}+</app-chip>
+          }
+        </div>
+      </div>
+
+      <!-- Toggles -->
+      <div class="sr__group">
+        <h3>{{ i18n.locale() === 'fr' ? 'Qualité & confort' : 'Quality & comfort' }}</h3>
+        <label class="sr__check">
+          <input type="checkbox" [checked]="onlyVerified()" (change)="onlyVerified.set($any($event.target).checked)" />
+          <span>{{ 'common.verified' | t }}</span>
+        </label>
+        <label class="sr__check">
+          <input type="checkbox" [checked]="onlyFurnished()" (change)="onlyFurnished.set($any($event.target).checked)" />
+          <span>{{ i18n.locale() === 'fr' ? 'Meublé' : 'Furnished' }}</span>
+        </label>
+        <label class="sr__check">
+          <input type="checkbox" [checked]="onlyGenerator()" (change)="onlyGenerator.set($any($event.target).checked)" />
+          <span>{{ i18n.locale() === 'fr' ? 'Générateur' : 'Generator' }}</span>
+        </label>
+        <label class="sr__check">
+          <input type="checkbox" [checked]="onlySecurity()" (change)="onlySecurity.set($any($event.target).checked)" />
+          <span>{{ i18n.locale() === 'fr' ? 'Sécurité 24/7' : '24/7 security' }}</span>
+        </label>
+      </div>
+
+      <footer class="sr__filters-foot">
+        <button appButton variant="secondary" [block]="true" (click)="reset()">
+          {{ i18n.locale() === 'fr' ? 'Réinitialiser' : 'Reset' }}
+        </button>
+      </footer>
+    </aside>
+
+    <!-- ─── Results ─────────────────────────────────────────── -->
+    <div class="sr__results">
+      @if (results().length === 0) {
+        <div class="sr__empty">
+          <app-icon name="search" [size]="40" [strokeWidth]="1.3" />
+          <h3>{{ i18n.locale() === 'fr' ? 'Aucun résultat' : 'No results' }}</h3>
+          <p class="muted">{{ i18n.locale() === 'fr' ? 'Essayez d\'élargir vos critères.' : 'Try broadening your criteria.' }}</p>
+          <button appButton variant="secondary" (click)="reset()">{{ i18n.locale() === 'fr' ? 'Réinitialiser les filtres' : 'Reset filters' }}</button>
+        </div>
+      } @else {
+        <div class="sr__grid">
+          @for (p of results(); track p.id; let i = $index) {
+            <div class="sr__cell" [style.--reveal-i]="i">
+              <app-property-card [property]="p" [locale]="i18n.locale()" />
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Mobile-only sticky filter button -->
+  <button type="button" class="sr__fab" (click)="toggleFilters()" aria-label="Filters">
+    <app-icon name="menu" [size]="20" />
+    <span>{{ i18n.locale() === 'fr' ? 'Filtres' : 'Filters' }}</span>
+    @if (activeFilterCount() > 0) {
+      <span class="sr__fab-count">{{ activeFilterCount() }}</span>
+    }
+  </button>
+
+  @if (filtersOpen()) {
+    <div class="sr__backdrop" (click)="toggleFilters()" aria-hidden="true"></div>
+  }
+</section>

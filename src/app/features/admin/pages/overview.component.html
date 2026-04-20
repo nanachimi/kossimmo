@@ -1,0 +1,127 @@
+<section class="ov">
+  <header class="ov__head">
+    <div>
+      <span class="eyebrow">— {{ i18n.locale() === 'fr' ? 'Tableau de bord' : 'Dashboard' }}</span>
+      <h1 class="ov__title">
+        {{ i18n.locale() === 'fr' ? 'Vue d\'ensemble' : 'Overview' }}
+        <span class="display-italic">{{ i18n.locale() === 'fr' ? ' ce mois-ci.' : ' this month.' }}</span>
+      </h1>
+    </div>
+    <div class="ov__head-actions">
+      <app-badge tone="accent">{{ i18n.locale() === 'fr' ? 'Temps réel' : 'Live' }}</app-badge>
+      <a appButton variant="secondary" size="sm" routerLink="/backoffice/reporting">
+        {{ i18n.locale() === 'fr' ? 'Rapport complet' : 'Full report' }}
+        <app-icon slot="trailing" name="arrow" [size]="14" />
+      </a>
+    </div>
+  </header>
+
+  <!-- KPI grid -->
+  <div class="ov__kpis">
+    <app-kpi-card
+      [label]="i18n.locale() === 'fr' ? 'Annonces actives' : 'Active listings'"
+      [value]="kpis.activeListings"
+      icon="building"
+      [delta]="kpis.activeListingsDelta" />
+    <app-kpi-card
+      [label]="i18n.locale() === 'fr' ? 'File modération' : 'Moderation queue'"
+      [value]="kpis.pendingModeration"
+      icon="shield"
+      [delta]="kpis.pendingModerationDelta"
+      [invertDelta]="true" />
+    <app-kpi-card
+      [label]="i18n.locale() === 'fr' ? 'Agents vérifiés' : 'Verified agents'"
+      [value]="kpis.verifiedAgents"
+      icon="check"
+      [delta]="kpis.verifiedAgentsDelta" />
+    <app-kpi-card
+      [label]="i18n.locale() === 'fr' ? 'Visites / mois' : 'Monthly visits'"
+      [value]="kpis.monthlyVisits"
+      icon="globe"
+      [delta]="kpis.monthlyVisitsDelta" />
+    <app-kpi-card
+      [label]="i18n.locale() === 'fr' ? 'Demandes de contact' : 'Contact requests'"
+      [value]="kpis.contactRequests"
+      icon="whatsapp"
+      [delta]="kpis.contactRequestsDelta" />
+    <app-kpi-card
+      [label]="i18n.locale() === 'fr' ? 'Temps moyen modération' : 'Avg review time'"
+      [value]="kpis.averageReviewMinutes"
+      suffix="min"
+      icon="sparkles"
+      [delta]="kpis.averageReviewDelta"
+      [invertDelta]="true" />
+  </div>
+
+  <!-- Charts row -->
+  <div class="ov__charts">
+    <article class="ov__chart">
+      <header>
+        <h2>{{ i18n.locale() === 'fr' ? 'Croissance — 12 semaines' : 'Growth — 12 weeks' }}</h2>
+        <p class="muted">{{ i18n.locale() === 'fr' ? 'Annonces actives, glissement hebdomadaire.' : 'Active listings, weekly rolling.' }}</p>
+      </header>
+      <app-mini-chart [data]="growth" mode="line" label="Growth trend" />
+    </article>
+
+    <article class="ov__chart">
+      <header>
+        <h2>{{ i18n.locale() === 'fr' ? 'Événements modération' : 'Moderation events' }}</h2>
+        <p class="muted">{{ i18n.locale() === 'fr' ? 'Annonces examinées par semaine.' : 'Listings reviewed per week.' }}</p>
+      </header>
+      <app-mini-chart [data]="mods" mode="line" accent="var(--forest)" label="Moderation volume" />
+    </article>
+
+    <article class="ov__chart ov__chart--wide">
+      <header>
+        <h2>{{ i18n.locale() === 'fr' ? 'Annonces par ville' : 'Listings by city' }}</h2>
+        <p class="muted">{{ i18n.locale() === 'fr' ? 'Répartition actuelle du parc.' : 'Current inventory split.' }}</p>
+      </header>
+      <app-mini-chart [data]="cities" mode="bar" [showAllLabels]="true" label="Listings by city" />
+    </article>
+  </div>
+
+  <!-- Moderation queue snapshot -->
+  <article class="ov__queue">
+    <header>
+      <div>
+        <h2>{{ i18n.locale() === 'fr' ? 'À modérer maintenant' : 'Awaiting review' }}</h2>
+        <p class="muted">{{ queue.length }} {{ i18n.locale() === 'fr' ? 'annonces en attente' : 'pending listings' }}</p>
+      </div>
+      <a appButton variant="primary" size="sm" routerLink="/backoffice/moderation">
+        {{ i18n.locale() === 'fr' ? 'Ouvrir la file' : 'Open queue' }}
+        <app-icon slot="trailing" name="arrow" [size]="14" />
+      </a>
+    </header>
+
+    <ul class="ov__queue-list" role="list">
+      @for (item of queue; track item.id) {
+        <li class="ov__queue-item">
+          <span class="ov__queue-prio" [attr.data-prio]="item.priority"></span>
+          <div class="ov__queue-meta">
+            <strong>{{ item.propertyTitle }}</strong>
+            <span>
+              {{ item.submittedBy }} · {{ item.city }} · {{ timeAgo(item.submittedAt) }}
+            </span>
+          </div>
+          <div class="ov__queue-flags">
+            @if (item.flags.length) {
+              @for (f of item.flags; track f) {
+                <app-badge tone="alert">{{ f }}</app-badge>
+              }
+            } @else {
+              <app-badge tone="neutral">{{ i18n.locale() === 'fr' ? 'Sans signalement' : 'Clean' }}</app-badge>
+            }
+          </div>
+          <div class="ov__queue-actions">
+            <button type="button" class="ov__approve" [attr.aria-label]="i18n.locale() === 'fr' ? 'Approuver' : 'Approve'">
+              <app-icon name="check" [size]="16" [strokeWidth]="2.5" />
+            </button>
+            <button type="button" class="ov__reject" [attr.aria-label]="i18n.locale() === 'fr' ? 'Rejeter' : 'Reject'">
+              <app-icon name="close" [size]="16" [strokeWidth]="2.5" />
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  </article>
+</section>

@@ -1,0 +1,180 @@
+// ═══════════════════════════════════════════════════════════════════
+// Kossimmo Design Tokens — "Modern Cameroon"
+// ═══════════════════════════════════════════════════════════════════
+// Token-first design system. Do NOT hardcode colors, radii, or
+// timings in components — reach for these variables instead.
+
+:root {
+  // ─── Color: Core ──────────────────────────────────────────────
+  // High-contrast near-black + crisp warm off-white.
+  // One saturated orange accent (respects the Cameroonian palette
+  // without the dated "savanna" feel). Electric lime for small
+  // callouts. Deep emerald for trust/verification.
+  --ink: #0a0a0a;
+  --ink-soft: #1f1f1f;
+  --ink-muted: #6b6b6b;
+  --paper: #fafaf7;
+  --paper-warm: #f2f1ec;
+  --accent: #ff4e1a;
+  --accent-hover: #e63e0d;
+  --accent-soft: #ffe5dc;
+  --accent-deep: #b52f00;
+  --lime: #d1f34b;
+  --forest: #0f5132;
+  --forest-soft: #166840;
+  --mist: #ececea;
+  --sand: #e7e4d9;
+  --alert: #e11d48;
+  --success: #10b981;
+
+  // Legacy aliases (kept so older component styles compile during transition)
+  --ochre: var(--accent);
+  --ochre-deep: var(--accent-deep);
+  --terracotta: var(--accent-hover);
+  --border-strong: #d4d4d1;
+
+  // ─── Color: Semantic ──────────────────────────────────────────
+  --surface: var(--paper);
+  --surface-raised: #ffffff;
+  --surface-inset: var(--paper-warm);
+  --border: var(--mist);
+  --text: var(--ink);
+  --text-muted: var(--ink-muted);
+  --text-on-dark: var(--paper);
+  --focus-ring: var(--accent);
+
+  // ─── Typography ───────────────────────────────────────────────
+  // Modern sans stack. Space Grotesk for display (geometric,
+  // technical, assertive). Inter for body. JetBrains Mono for
+  // numerics/IDs/prices.
+  --font-display: "Space Grotesk", "Inter", -apple-system,
+    "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", -apple-system, "Segoe UI", system-ui,
+    sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+
+  // Fluid type scale (clamp: min, preferred, max)
+  --step--2: clamp(0.72rem, 0.68rem + 0.18vw, 0.82rem);
+  --step--1: clamp(0.82rem, 0.78rem + 0.22vw, 0.94rem);
+  --step-0:  clamp(0.95rem, 0.90rem + 0.24vw, 1.05rem);
+  --step-1:  clamp(1.10rem, 1.02rem + 0.40vw, 1.25rem);
+  --step-2:  clamp(1.28rem, 1.14rem + 0.70vw, 1.56rem);
+  --step-3:  clamp(1.60rem, 1.35rem + 1.20vw, 2.20rem);
+  --step-4:  clamp(2.10rem, 1.65rem + 2.20vw, 3.20rem);
+  --step-5:  clamp(2.80rem, 2.10rem + 3.40vw, 4.60rem);
+  --step-6:  clamp(3.40rem, 2.40rem + 4.60vw, 6.40rem);
+
+  --lh-tight: 1.02;
+  --lh-snug: 1.15;
+  --lh-body: 1.55;
+  --lh-loose: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+  --tracking-display: -0.04em;
+
+  // ─── Spacing (4px base) ───────────────────────────────────────
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+  --space-10: 4rem;
+  --space-12: 6rem;
+  --space-16: 8rem;
+  --space-20: 10rem;
+
+  // ─── Radii ────────────────────────────────────────────────────
+  --radius-xs: 6px;   // buttons, chips — slightly softer
+  --radius-sm: 10px;  // inputs
+  --radius-md: 16px;  // cards
+  --radius-lg: 20px;  // raised cards
+  --radius-xl: 28px;  // heros, modals
+  --radius-pill: 999px;
+
+  // ─── Shadows — crisp, modern ──────────────────────────────────
+  --shadow-xs: 0 1px 2px rgba(10, 10, 10, 0.04);
+  --shadow-sm: 0 2px 8px rgba(10, 10, 10, 0.05);
+  --shadow-md: 0 10px 24px rgba(10, 10, 10, 0.07);
+  --shadow-lg: 0 20px 48px rgba(10, 10, 10, 0.10);
+  --shadow-xl: 0 32px 80px rgba(10, 10, 10, 0.14);
+  --shadow-focus: 0 0 0 3px rgba(255, 78, 26, 0.28);
+
+  // ─── Motion ───────────────────────────────────────────────────
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-hero: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --dur-xs: 120ms;
+  --dur-sm: 220ms;
+  --dur-md: 360ms;
+  --dur-lg: 540ms;
+  --dur-xl: 820ms;
+  --dur-hero: 1100ms;
+  --stagger: 70ms;
+
+  // ─── Layout ───────────────────────────────────────────────────
+  --container-narrow: 68rem;
+  --container: 82rem;
+  --container-wide: 94rem;
+  --grid-gutter-desktop: 1.5rem;
+  --grid-gutter-mobile: 1rem;
+
+  --header-height: 72px;
+  --header-height-mobile: 60px;
+
+  // ─── Z-Index scale ────────────────────────────────────────────
+  --z-base: 1;
+  --z-raised: 10;
+  --z-sticky: 50;
+  --z-header: 100;
+  --z-overlay: 500;
+  --z-modal: 1000;
+  --z-toast: 1500;
+  --z-cursor: 9999;
+}
+
+// ─── prefers-reduced-motion ─────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-xs: 0ms;
+    --dur-sm: 0ms;
+    --dur-md: 0ms;
+    --dur-lg: 0ms;
+    --dur-xl: 0ms;
+    --dur-hero: 0ms;
+    --stagger: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// ─── Dark mode scaffold (not default) ───────────────────────────
+[data-theme="dark"] {
+  --surface: #0a0a0a;
+  --surface-raised: #131313;
+  --surface-inset: #0a0a0a;
+  --paper: #0a0a0a;
+  --paper-warm: #131313;
+  --border: #232323;
+  --border-strong: #2e2e2e;
+  --text: #fafaf7;
+  --text-muted: #a1a1a1;
+  --ink: #fafaf7;
+  --ink-soft: #d4d4d4;
+  --ink-muted: #a1a1a1;
+  --mist: #232323;
+  --sand: #2e2e2e;
+}

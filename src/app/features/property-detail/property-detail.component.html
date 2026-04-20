@@ -1,0 +1,216 @@
+@if (property(); as p) {
+  <article class="pd">
+    <!-- Gallery -->
+    <section class="pd__gallery">
+      <div class="pd__main" (click)="openLightbox()" role="button" tabindex="0" (keydown.enter)="openLightbox()" [attr.aria-label]="i18n.locale() === 'fr' ? 'Agrandir la photo' : 'Enlarge photo'">
+        <img [src]="p.photos[activePhoto()].url" [alt]="p.photos[activePhoto()].alt" />
+        <button type="button" class="pd__zoom" (click)="openLightbox(); $event.stopPropagation()">
+          <app-icon name="sparkles" [size]="16" />
+          <span>{{ i18n.locale() === 'fr' ? 'Voir toutes les photos' : 'View all photos' }}</span>
+        </button>
+      </div>
+      @if (p.photos.length > 1) {
+        <div class="pd__thumbs">
+          @for (photo of p.photos; track photo.url; let i = $index) {
+            <button type="button" class="pd__thumb" [class.is-active]="i === activePhoto()" (click)="setPhoto(i)" [attr.aria-label]="'Photo ' + (i+1)">
+              <img [src]="photo.url" [alt]="photo.alt" loading="lazy" />
+            </button>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Body -->
+    <div class="container pd__layout">
+      <div class="pd__main-col">
+        <button type="button" class="pd__back" (click)="back()">
+          <app-icon name="chevron" [size]="14" />
+          <span>{{ i18n.locale() === 'fr' ? 'Retour aux résultats' : 'Back to results' }}</span>
+        </button>
+
+        <header class="pd__head">
+          <div class="pd__badges">
+            <app-badge tone="paper">{{ p.mode === 'rent' ? ('common.forRent' | t) : ('common.forSale' | t) }}</app-badge>
+            @if (p.verified) {
+              <app-badge tone="forest" icon="shield">{{ 'common.verified' | t }}</app-badge>
+            }
+            @if (p.featured) {
+              <app-badge tone="accent" icon="sparkles">{{ 'common.featured' | t }}</app-badge>
+            }
+          </div>
+          <h1 class="pd__title">{{ p.title[i18n.locale()] }}</h1>
+          <p class="pd__loc"><app-icon name="pin" [size]="16" /> {{ p.location.neighborhood }}, {{ p.location.city }}</p>
+        </header>
+
+        <section class="pd__specs">
+          @if (p.bedrooms > 0) {
+            <div><app-icon name="bed" [size]="22" /><span>{{ p.bedrooms }} {{ 'common.bedrooms' | t }}</span></div>
+          }
+          @if (p.bathrooms > 0) {
+            <div><app-icon name="bath" [size]="22" /><span>{{ p.bathrooms }} {{ 'common.bathrooms' | t }}</span></div>
+          }
+          @if (p.livingArea > 0) {
+            <div><app-icon name="ruler" [size]="22" /><span>{{ p.livingArea }} {{ 'common.area' | t }}</span></div>
+          }
+          @if (p.landArea) {
+            <div><app-icon name="leaf" [size]="22" /><span>{{ p.landArea }} m² {{ i18n.locale() === 'fr' ? 'terrain' : 'land' }}</span></div>
+          }
+        </section>
+
+        <section class="pd__section">
+          <h2>{{ i18n.locale() === 'fr' ? 'Description' : 'Description' }}</h2>
+          <p>{{ p.description[i18n.locale()] }}</p>
+        </section>
+
+        <!-- Infrastructure — promoted section -->
+        <section class="pd__section pd__infra-section">
+          <h2>
+            <span>{{ i18n.locale() === 'fr' ? 'Infrastructure' : 'Infrastructure' }}</span>
+            <small>{{ i18n.locale() === 'fr' ? 'Les vraies questions, en clair.' : 'The real questions, laid out plainly.' }}</small>
+          </h2>
+          <ul class="pd__infra">
+            <li>
+              <span class="pd__infra-ic"><app-icon name="droplet" [size]="22" /></span>
+              <div>
+                <strong>{{ i18n.locale() === 'fr' ? 'Eau' : 'Water' }}</strong>
+                <span>
+                  @switch (p.infrastructure.water) {
+                    @case ('city') { {{ i18n.locale() === 'fr' ? 'Réseau urbain' : 'City network' }} }
+                    @case ('borehole') { {{ i18n.locale() === 'fr' ? 'Forage' : 'Borehole' }} }
+                    @case ('tank') { Tank }
+                    @default { — }
+                  }
+                  @if (p.infrastructure.tank) { · {{ i18n.locale() === 'fr' ? 'Tank installé' : 'Tank installed' }} }
+                </span>
+              </div>
+            </li>
+            <li>
+              <span class="pd__infra-ic"><app-icon name="bolt" [size]="22" /></span>
+              <div>
+                <strong>{{ i18n.locale() === 'fr' ? 'Électricité' : 'Power' }}</strong>
+                <span>
+                  @switch (p.infrastructure.power) {
+                    @case ('grid') { ENEO }
+                    @case ('grid_generator') { ENEO + {{ i18n.locale() === 'fr' ? 'Générateur' : 'Generator' }} }
+                    @case ('solar') { {{ i18n.locale() === 'fr' ? 'Solaire' : 'Solar' }} }
+                    @case ('generator') { {{ i18n.locale() === 'fr' ? 'Générateur seul' : 'Generator only' }} }
+                    @default { — }
+                  }
+                </span>
+              </div>
+            </li>
+            <li>
+              <span class="pd__infra-ic"><app-icon name="road" [size]="22" /></span>
+              <div>
+                <strong>{{ i18n.locale() === 'fr' ? 'Route' : 'Road' }}</strong>
+                <span>
+                  @switch (p.infrastructure.road) {
+                    @case ('paved') { {{ i18n.locale() === 'fr' ? 'Bitume' : 'Paved' }} }
+                    @case ('gravel') { {{ i18n.locale() === 'fr' ? 'Latérite' : 'Gravel' }} }
+                    @case ('dirt') { {{ i18n.locale() === 'fr' ? 'Piste' : 'Dirt' }} }
+                    @case ('seasonal') { {{ i18n.locale() === 'fr' ? 'Saisonnière' : 'Seasonal' }} }
+                  }
+                </span>
+              </div>
+            </li>
+            <li>
+              <span class="pd__infra-ic"><app-icon name="shield" [size]="22" /></span>
+              <div>
+                <strong>{{ i18n.locale() === 'fr' ? 'Sécurité' : 'Security' }}</strong>
+                <span>
+                  @switch (p.infrastructure.security) {
+                    @case ('guarded') { {{ i18n.locale() === 'fr' ? 'Gardien 24/7' : '24/7 guard' }} }
+                    @case ('gated') { {{ i18n.locale() === 'fr' ? 'Barrière' : 'Gated' }} }
+                    @case ('fenced') { {{ i18n.locale() === 'fr' ? 'Clôture' : 'Fenced' }} }
+                    @case ('open') { {{ i18n.locale() === 'fr' ? 'Ouvert' : 'Open' }} }
+                  }
+                </span>
+              </div>
+            </li>
+            @if (p.infrastructure.transitMinutes != null) {
+              <li>
+                <span class="pd__infra-ic"><app-icon name="pin" [size]="22" /></span>
+                <div>
+                  <strong>{{ i18n.locale() === 'fr' ? 'Transports' : 'Transit' }}</strong>
+                  <span>{{ p.infrastructure.transitMinutes }} min</span>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="pd__section">
+          <h2>{{ i18n.locale() === 'fr' ? 'Emplacement' : 'Location' }}</h2>
+          <div class="pd__map-stub">
+            <app-icon name="pin" [size]="36" [strokeWidth]="1.3" />
+            <p>{{ p.location.neighborhood }} — {{ p.location.city }}</p>
+            <small>{{ i18n.locale() === 'fr' ? 'Carte interactive — à venir' : 'Interactive map — coming soon' }}</small>
+          </div>
+        </section>
+      </div>
+
+      <!-- Sticky sidebar -->
+      <aside class="pd__sidebar">
+        <div class="pd__box">
+          <span class="pd__price-label">{{ p.mode === 'rent' ? ('common.forRent' | t) : ('common.forSale' | t) }}</span>
+          <strong class="pd__price mono">{{ p.price | xaf }}</strong>
+
+          <div class="pd__agent">
+            <app-monogram class="pd__agent-avatar" [name]="p.agent.name" [url]="p.agent.avatarUrl" style="--mono-size: 52px;" />
+            <div>
+              <strong>{{ p.agent.name }}</strong>
+              <span>{{ p.agent.agency }}</span>
+              <small>★ {{ p.agent.rating.toFixed(1) }} · {{ p.agent.listings }} {{ i18n.locale() === 'fr' ? 'annonces' : 'listings' }}</small>
+            </div>
+          </div>
+
+          <div class="pd__contact">
+            <button appButton variant="whatsapp" [block]="true" (click)="openWhatsApp()">
+              <app-icon slot="leading" name="whatsapp" [size]="18" />
+              WhatsApp
+            </button>
+            <a appButton variant="secondary" [block]="true" [href]="'tel:' + p.agent.phone">
+              <app-icon slot="leading" name="phone" [size]="18" />
+              {{ i18n.locale() === 'fr' ? 'Appeler' : 'Call' }}
+            </a>
+            <button appButton variant="ghost" [block]="true" (click)="showContactForm.set(!showContactForm())">
+              <app-icon slot="leading" name="sparkles" [size]="18" />
+              {{ i18n.locale() === 'fr' ? 'Demander une visite' : 'Request a visit' }}
+            </button>
+          </div>
+
+          @if (showContactForm()) {
+            <form class="pd__form" (submit)="$event.preventDefault(); submitVisit()">
+              <input type="text" [placeholder]="i18n.locale() === 'fr' ? 'Nom complet' : 'Full name'" required />
+              <input type="tel" [placeholder]="i18n.locale() === 'fr' ? 'Téléphone' : 'Phone'" required />
+              <textarea rows="3" [placeholder]="i18n.locale() === 'fr' ? 'Message (optionnel)' : 'Message (optional)'"></textarea>
+              <button appButton variant="primary" [block]="true" type="submit">
+                {{ i18n.locale() === 'fr' ? 'Envoyer la demande' : 'Send request' }}
+              </button>
+            </form>
+          }
+
+          <small class="pd__legal">
+            <app-icon name="shield" [size]="14" />
+            {{ i18n.locale() === 'fr' ? 'Vérifiez toujours un titre foncier avant tout engagement.' : 'Always verify a land title before any commitment.' }}
+          </small>
+        </div>
+      </aside>
+    </div>
+
+    @if (lightboxOpen()) {
+      <div class="pd__lightbox" role="dialog" aria-modal="true" (click)="closeLightbox()">
+        <button type="button" class="pd__lb-close" (click)="closeLightbox()" [attr.aria-label]="i18n.locale() === 'fr' ? 'Fermer' : 'Close'">
+          <app-icon name="close" [size]="22" />
+        </button>
+        <img [src]="p.photos[activePhoto()].url" [alt]="p.photos[activePhoto()].alt" (click)="$event.stopPropagation()" />
+      </div>
+    }
+  </article>
+} @else {
+  <section class="pd-missing container">
+    <h1>{{ i18n.locale() === 'fr' ? 'Annonce introuvable' : 'Listing not found' }}</h1>
+    <p>{{ i18n.locale() === 'fr' ? "Cette annonce a peut-être été retirée." : "This listing may have been removed." }}</p>
+    <a appButton variant="primary" [routerLink]="'rent' | route">{{ i18n.locale() === 'fr' ? 'Voir les annonces' : 'Browse listings' }}</a>
+  </section>
+}

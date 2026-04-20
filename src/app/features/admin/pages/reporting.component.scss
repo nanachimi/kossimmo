@@ -1,0 +1,199 @@
+:host { display: block; }
+
+.rp { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.rp__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  justify-content: space-between;
+
+  @media (min-width: 960px) { flex-direction: row; align-items: flex-end; }
+}
+
+.rp__title {
+  font-family: var(--font-display);
+  font-size: var(--step-4);
+  font-weight: 500;
+  letter-spacing: var(--tracking-display);
+  margin-top: var(--space-2);
+}
+
+.rp__head-actions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.rp__range {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--surface-inset);
+  border-radius: var(--radius-pill);
+
+  button {
+    padding: 0.45rem 0.9rem;
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: var(--radius-pill);
+    transition: background-color var(--dur-sm) var(--ease-out),
+      color var(--dur-sm) var(--ease-out);
+
+    &.is-active {
+      background: var(--surface-raised);
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+    }
+  }
+}
+
+// ─── Panels ─────────────────────────────────────────
+.rp__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+
+  @media (min-width: 960px) { grid-template-columns: 1fr 1fr; }
+}
+
+.rp__panel {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  &--wide {
+    @media (min-width: 960px) { grid-column: 1 / -1; }
+  }
+
+  > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+
+    h2 {
+      font-family: var(--font-display);
+      font-size: var(--step-2);
+      font-weight: 500;
+      letter-spacing: var(--tracking-display);
+    }
+  }
+}
+
+// ─── Top agents ─────────────────────────────────────
+.rp__top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rp__top li {
+  display: grid;
+  grid-template-columns: auto minmax(8rem, 14rem) 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border);
+
+  &:first-child { border-top: 0; }
+}
+
+.rp__rank {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-inset);
+  border-radius: 50%;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rp__top li:first-child .rp__rank {
+  background: var(--accent);
+  color: #fff;
+}
+
+.rp__who {
+  min-width: 0;
+
+  strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  span {
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+}
+
+.rp__bar {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-inset);
+  overflow: hidden;
+}
+
+.rp__bar-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  border-radius: var(--radius-pill);
+  transition: width var(--dur-md) var(--ease-out);
+}
+
+.rp__listings {
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  font-weight: 500;
+  min-width: 3ch;
+  text-align: right;
+}
+
+// ─── Funnel ─────────────────────────────────────────
+.rp__funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.rp__funnel li {
+  --pct: 100;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.85rem 1rem;
+  background: var(--surface-inset);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 calc(100% - var(--pct) * 1%) 0 0;
+    background: linear-gradient(90deg, rgba(255, 78, 26, 0.15), rgba(255, 78, 26, 0.05));
+    z-index: -1;
+    transition: inset var(--dur-md) var(--ease-out);
+  }
+
+  &:first-child::before { inset: 0; background: linear-gradient(90deg, rgba(255, 78, 26, 0.28), rgba(255, 78, 26, 0.12)); }
+
+  span { font-size: var(--step-0); font-weight: 500; color: var(--ink); }
+  strong { font-family: var(--font-mono); font-size: var(--step-1); font-weight: 500; color: var(--ink); }
+}

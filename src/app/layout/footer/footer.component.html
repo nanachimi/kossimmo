@@ -1,0 +1,57 @@
+<footer class="ft">
+  <div class="container ft__inner">
+    <div class="ft__brand">
+      <div class="ft__mark">
+        <svg viewBox="0 0 32 32" width="38" height="38" fill="none" aria-hidden="true">
+          <path d="M4 28 L4 14.5 L16 4 L28 14.5 L28 28 Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M13.5 28 V22 C13.5 20.5 14.6 19.5 16 19.5 C17.4 19.5 18.5 20.5 18.5 22 V28 Z" fill="#ff4e1a"/>
+        </svg>
+        <span class="ft__name">{{ 'brand.name' | t }}</span>
+      </div>
+      <p class="ft__tag">{{ 'footer.tagline' | t }}</p>
+      <div class="ft__free">
+        <app-icon name="sparkles" [size]="14" />
+        <span>{{ 'footer.free' | t }}</span>
+      </div>
+    </div>
+
+    <nav class="ft__col" aria-label="Explore">
+      <h4>{{ 'footer.explore' | t }}</h4>
+      <a [routerLink]="'rent' | route">{{ 'nav.rent' | t }}</a>
+      <a [routerLink]="'buy' | route">{{ 'nav.buy' | t }}</a>
+      <a [routerLink]="'land' | route">{{ 'nav.land' | t }}</a>
+      <a [routerLink]="'agents' | route">{{ 'nav.agents' | t }}</a>
+    </nav>
+
+    <nav class="ft__col" aria-label="Company">
+      <h4>{{ 'footer.company' | t }}</h4>
+      <a [routerLink]="'about' | route">{{ 'nav.about' | t }}</a>
+      <a [routerLink]="'contact' | route">{{ 'footer.contact' | t }}</a>
+      <a [routerLink]="'journal' | route">{{ 'editorial.eyebrow' | t }}</a>
+    </nav>
+
+    <nav class="ft__col" aria-label="Legal">
+      <h4>{{ 'footer.legal' | t }}</h4>
+      <a [routerLink]="'terms' | route">{{ 'footer.legal.terms' | t }}</a>
+      <a [routerLink]="'privacy' | route">{{ 'footer.legal.privacy' | t }}</a>
+      <a [routerLink]="'cookies' | route">{{ 'footer.legal.cookies' | t }}</a>
+    </nav>
+
+    <div class="ft__col ft__lang-col">
+      <h4>{{ 'footer.language' | t }}</h4>
+      <div class="ft__lang">
+        <button (click)="switch('fr')" [class.is-active]="i18n.locale() === 'fr'">FR — Français</button>
+        <button (click)="switch('en')" [class.is-active]="i18n.locale() === 'en'">EN — English</button>
+      </div>
+      <div class="ft__apps">
+        <span class="ft__app-badge">App Store</span>
+        <span class="ft__app-badge">Google Play</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container ft__bottom">
+    <small>© {{ year }} — {{ 'footer.copyright' | t }}</small>
+    <span class="ft__made">Conçu à Douala · Yaoundé · Bafoussam</span>
+  </div>
+</footer>

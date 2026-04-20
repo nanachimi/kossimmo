@@ -1,0 +1,143 @@
+<section class="md">
+  <header class="md__head">
+    <div>
+      <span class="eyebrow">— {{ i18n.locale() === 'fr' ? 'Modération' : 'Moderation' }}</span>
+      <h1 class="md__title">
+        {{ i18n.locale() === 'fr' ? 'File d\'attente' : 'Queue' }}
+        <span class="display-italic">{{ filtered().length }}</span>
+      </h1>
+      <p class="muted">
+        {{ i18n.locale() === 'fr'
+          ? 'Revoyez chaque annonce selon les règles éditoriales avant publication.'
+          : 'Review every listing against the editorial guidelines before publication.' }}
+      </p>
+    </div>
+
+    <div class="md__toolbar">
+      <div class="md__search">
+        <app-icon name="search" [size]="16" />
+        <input
+          type="search"
+          [ngModel]="query()"
+          (ngModelChange)="query.set($event)"
+          [placeholder]="i18n.locale() === 'fr' ? 'Titre, agent, ville…' : 'Title, agent, city…'"
+        />
+      </div>
+      <div class="md__chips">
+        <app-chip [active]="priority() === 'all'" (clicked)="priority.set('all')">{{ i18n.locale() === 'fr' ? 'Toutes' : 'All' }}</app-chip>
+        <app-chip [active]="priority() === 'high'" (clicked)="priority.set('high')">{{ i18n.locale() === 'fr' ? 'Haute' : 'High' }}</app-chip>
+        <app-chip [active]="priority() === 'normal'" (clicked)="priority.set('normal')">{{ i18n.locale() === 'fr' ? 'Normale' : 'Normal' }}</app-chip>
+        <app-chip [active]="priority() === 'low'" (clicked)="priority.set('low')">{{ i18n.locale() === 'fr' ? 'Basse' : 'Low' }}</app-chip>
+      </div>
+    </div>
+  </header>
+
+  <div class="md__split">
+    <!-- Queue list -->
+    <div class="md__list">
+      @if (filtered().length === 0) {
+        <div class="md__empty">
+          <app-icon name="check" [size]="40" [strokeWidth]="1.3" />
+          <h3>{{ i18n.locale() === 'fr' ? 'File vide' : 'Queue clear' }}</h3>
+          <p class="muted">{{ i18n.locale() === 'fr' ? 'Beau travail.' : 'Nice work.' }}</p>
+        </div>
+      } @else {
+        <ul role="list">
+          @for (item of filtered(); track item.id) {
+            <li
+              class="md__row"
+              [class.is-active]="selectedId() === item.id"
+              (click)="select(item.id)"
+            >
+              <span class="md__prio" [attr.data-prio]="item.priority"></span>
+              <div class="md__row-meta">
+                <strong>{{ item.propertyTitle }}</strong>
+                <span>{{ item.submittedBy }} · {{ item.city }}</span>
+              </div>
+              @if (item.flags.length) {
+                <app-badge tone="alert">{{ item.flags.length }}</app-badge>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <!-- Detail panel -->
+    <aside class="md__detail">
+      @if (selected(); as sel) {
+        <header>
+          <div>
+            <span class="eyebrow">— {{ 'Annonce ' + sel.id }}</span>
+            <h2>{{ sel.propertyTitle }}</h2>
+            <p class="muted">{{ sel.submittedBy }} · {{ sel.city }}</p>
+          </div>
+          <app-badge [tone]="sel.priority === 'high' ? 'alert' : sel.priority === 'normal' ? 'accent' : 'neutral'">
+            {{ sel.priority }}
+          </app-badge>
+        </header>
+
+        <div class="md__detail-body">
+          <section>
+            <h3>{{ i18n.locale() === 'fr' ? 'Signalements automatiques' : 'Auto flags' }}</h3>
+            @if (sel.flags.length) {
+              <ul class="md__flags">
+                @for (f of sel.flags; track f) {
+                  <li><app-icon name="shield" [size]="14" /> {{ f }}</li>
+                }
+              </ul>
+            } @else {
+              <p class="muted">{{ i18n.locale() === 'fr' ? 'Aucun signalement.' : 'None.' }}</p>
+            }
+          </section>
+
+          <section>
+            <h3>{{ i18n.locale() === 'fr' ? 'Checklist éditoriale' : 'Editorial checklist' }}</h3>
+            <ul class="md__check">
+              <li>
+                <input type="checkbox" checked disabled />
+                {{ i18n.locale() === 'fr' ? 'Au moins 3 photos' : 'At least 3 photos' }}
+              </li>
+              <li>
+                <input type="checkbox" checked disabled />
+                {{ i18n.locale() === 'fr' ? 'Quartier + ville présents' : 'Neighborhood + city present' }}
+              </li>
+              <li>
+                <input type="checkbox" disabled />
+                {{ i18n.locale() === 'fr' ? 'Infrastructure renseignée' : 'Infrastructure declared' }}
+              </li>
+              <li>
+                <input type="checkbox" disabled />
+                {{ i18n.locale() === 'fr' ? 'Prix cohérent avec le marché' : 'Price aligned with market' }}
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <footer class="md__detail-foot">
+          <button appButton variant="secondary" (click)="decide(sel.id, 'flag')">
+            <app-icon slot="leading" name="shield" [size]="16" />
+            {{ i18n.locale() === 'fr' ? 'Signaler' : 'Flag' }}
+          </button>
+          <button appButton variant="whatsapp" (click)="decide(sel.id, 'approve')">
+            <app-icon slot="leading" name="check" [size]="16" [strokeWidth]="2.5" />
+            {{ i18n.locale() === 'fr' ? 'Approuver' : 'Approve' }}
+          </button>
+          <button appButton variant="primary" (click)="decide(sel.id, 'reject')">
+            <app-icon slot="leading" name="close" [size]="16" [strokeWidth]="2.5" />
+            {{ i18n.locale() === 'fr' ? 'Rejeter' : 'Reject' }}
+          </button>
+        </footer>
+      } @else {
+        <div class="md__empty">
+          <app-icon name="search" [size]="36" [strokeWidth]="1.3" />
+          <p class="muted">
+            {{ i18n.locale() === 'fr'
+              ? 'Sélectionnez une annonce pour commencer la modération.'
+              : 'Select a listing to start moderating.' }}
+          </p>
+        </div>
+      }
+    </aside>
+  </div>
+</section>

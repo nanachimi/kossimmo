@@ -1,0 +1,108 @@
+<section class="rp">
+  <header class="rp__head">
+    <div>
+      <span class="eyebrow">— {{ i18n.locale() === 'fr' ? 'Reporting' : 'Reporting' }}</span>
+      <h1 class="rp__title">
+        {{ i18n.locale() === 'fr' ? 'Performance de la plateforme' : 'Platform performance' }}
+      </h1>
+    </div>
+
+    <div class="rp__head-actions">
+      <div class="rp__range" role="group" aria-label="Range">
+        @for (r of ranges; track r) {
+          <button type="button" [class.is-active]="range() === r" (click)="range.set(r)">{{ rangeLabel(r) }}</button>
+        }
+      </div>
+      <button appButton variant="secondary" size="sm">
+        <app-icon slot="leading" name="arrow" [size]="14" />
+        {{ i18n.locale() === 'fr' ? 'Exporter CSV' : 'Export CSV' }}
+      </button>
+    </div>
+  </header>
+
+  <!-- Growth + moderation -->
+  <div class="rp__grid">
+    <article class="rp__panel">
+      <header>
+        <h2>{{ i18n.locale() === 'fr' ? 'Croissance du parc' : 'Inventory growth' }}</h2>
+        <app-badge tone="success">+{{ kpis.activeListingsDelta }}%</app-badge>
+      </header>
+      <app-mini-chart [data]="growth" mode="line" label="Growth" />
+      <p class="muted">
+        {{ i18n.locale() === 'fr'
+          ? kpis.activeListings + ' annonces actives — en progression constante depuis 12 semaines.'
+          : kpis.activeListings + ' active listings — steady growth over 12 weeks.' }}
+      </p>
+    </article>
+
+    <article class="rp__panel">
+      <header>
+        <h2>{{ i18n.locale() === 'fr' ? 'Files de modération' : 'Moderation throughput' }}</h2>
+        <app-badge tone="success">{{ kpis.averageReviewDelta }}%</app-badge>
+      </header>
+      <app-mini-chart [data]="mods" mode="line" accent="var(--forest)" label="Moderation events" />
+      <p class="muted">
+        {{ i18n.locale() === 'fr'
+          ? 'Temps moyen ' + kpis.averageReviewMinutes + ' min — amélioration de ' + (-kpis.averageReviewDelta) + '% vs mois dernier.'
+          : 'Average ' + kpis.averageReviewMinutes + ' min — improved ' + (-kpis.averageReviewDelta) + '% vs last month.' }}
+      </p>
+    </article>
+
+    <article class="rp__panel rp__panel--wide">
+      <header>
+        <h2>{{ i18n.locale() === 'fr' ? 'Répartition par ville' : 'Distribution by city' }}</h2>
+      </header>
+      <app-mini-chart [data]="cities" mode="bar" [showAllLabels]="true" label="Cities breakdown" />
+    </article>
+  </div>
+
+  <!-- Top agents -->
+  <article class="rp__panel">
+    <header>
+      <h2>{{ i18n.locale() === 'fr' ? 'Meilleurs agents' : 'Top agents' }}</h2>
+      <p class="muted">{{ i18n.locale() === 'fr' ? 'Par nombre d\'annonces actives.' : 'By active listings.' }}</p>
+    </header>
+
+    <ol class="rp__top">
+      @for (a of topAgents; track a.name; let i = $index) {
+        <li>
+          <span class="rp__rank mono">{{ i + 1 }}</span>
+          <div class="rp__who">
+            <strong>{{ a.name }}</strong>
+            <span>{{ a.city }}</span>
+          </div>
+          <div class="rp__bar">
+            <span class="rp__bar-fill" [style.width.%]="(a.listings / topAgents[0].listings) * 100"></span>
+          </div>
+          <span class="rp__listings mono">{{ a.listings }}</span>
+        </li>
+      }
+    </ol>
+  </article>
+
+  <!-- Funnel summary -->
+  <article class="rp__panel">
+    <header>
+      <h2>{{ i18n.locale() === 'fr' ? 'Entonnoir mensuel' : 'Monthly funnel' }}</h2>
+      <p class="muted">{{ i18n.locale() === 'fr' ? 'Du visiteur à la prise de contact.' : 'From visitor to agent contact.' }}</p>
+    </header>
+    <ul class="rp__funnel">
+      <li>
+        <span>{{ i18n.locale() === 'fr' ? 'Visiteurs uniques' : 'Unique visitors' }}</span>
+        <strong class="mono">{{ kpis.monthlyVisits }}</strong>
+      </li>
+      <li style="--pct: 68">
+        <span>{{ i18n.locale() === 'fr' ? 'Pages annonces vues' : 'Listing views' }}</span>
+        <strong class="mono">125 338</strong>
+      </li>
+      <li style="--pct: 24">
+        <span>{{ i18n.locale() === 'fr' ? 'Annonces sauvegardées' : 'Listings saved' }}</span>
+        <strong class="mono">44 218</strong>
+      </li>
+      <li style="--pct: 12">
+        <span>{{ i18n.locale() === 'fr' ? 'Demandes de contact' : 'Contact requests' }}</span>
+        <strong class="mono">{{ kpis.contactRequests }}</strong>
+      </li>
+    </ul>
+  </article>
+</section>

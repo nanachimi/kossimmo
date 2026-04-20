@@ -1,0 +1,131 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition:
+    transform var(--dur-sm) var(--ease-out),
+    background-color var(--dur-sm) var(--ease-out),
+    border-color var(--dur-sm) var(--ease-out),
+    box-shadow var(--dur-sm) var(--ease-out),
+    color var(--dur-sm) var(--ease-out);
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+
+  &:hover:not([disabled]) {
+    transform: translateY(-2px);
+  }
+
+  &:active:not([disabled]) {
+    transform: translateY(0);
+    transition-duration: var(--dur-xs);
+  }
+
+  &[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+}
+
+// ─── Sizes ────────────────────────────────────────────────
+:host(.btn--sm) {
+  padding: 0.5rem 0.9rem;
+  font-size: var(--step--1);
+  min-height: 36px;
+}
+:host(.btn--md) {
+  padding: 0.75rem 1.25rem;
+  font-size: var(--step-0);
+  min-height: 44px;
+}
+:host(.btn--lg) {
+  padding: 1rem 1.75rem;
+  font-size: var(--step-1);
+  min-height: 56px;
+  letter-spacing: 0.01em;
+}
+
+:host(.btn--block) {
+  display: flex;
+  width: 100%;
+}
+
+// ─── Variants ─────────────────────────────────────────────
+:host(.btn--primary) {
+  background: var(--ochre);
+  color: var(--paper);
+  box-shadow: 0 1px 0 rgba(26, 23, 19, 0.14), var(--shadow-sm);
+
+  &:hover:not([disabled]) {
+    background: var(--terracotta);
+    box-shadow: 0 1px 0 rgba(26, 23, 19, 0.18), var(--shadow-md);
+  }
+}
+
+:host(.btn--secondary) {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--border-strong);
+
+  &:hover:not([disabled]) {
+    border-color: var(--ink);
+    background: rgba(26, 23, 19, 0.03);
+  }
+}
+
+:host(.btn--ghost) {
+  background: transparent;
+  color: var(--ink);
+
+  &:hover:not([disabled]) {
+    background: rgba(26, 23, 19, 0.05);
+  }
+}
+
+:host(.btn--whatsapp) {
+  background: #25d366;
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+
+  &:hover:not([disabled]) {
+    background: #1ebe5c;
+    box-shadow: var(--shadow-md);
+  }
+}
+
+// ─── Loading ──────────────────────────────────────────────
+:host(.btn--loading) .label {
+  opacity: 0;
+}
+
+:host(.btn--loading)::after {
+  content: "";
+  position: absolute;
+  width: 1.1em;
+  height: 1.1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ─── Focus ────────────────────────────────────────────────
+:host(:focus-visible) {
+  outline: none;
+  box-shadow: var(--shadow-focus), var(--shadow-sm);
+}
