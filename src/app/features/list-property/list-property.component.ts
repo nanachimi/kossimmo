@@ -16,19 +16,28 @@ import { ChipComponent } from "../../ui/chip/chip.component";
 import { BadgeComponent } from "../../ui/badge/badge.component";
 import type { PropertyType } from "../../core/models/property.model";
 
-type StepKey =
-  | "basics"
-  | "location"
-  | "photos"
-  | "infrastructure"
-  | "price"
-  | "preview";
+type StepKey = "bien" | "emplacement" | "description" | "prix";
 
 interface WizardStep {
   readonly key: StepKey;
   readonly title: { fr: string; en: string };
+  readonly hint: { fr: string; en: string };
 }
 
+interface TypeOption {
+  readonly key: PropertyType;
+  readonly icon: string;
+  readonly fr: string;
+  readonly en: string;
+  readonly blurb: { fr: string; en: string };
+}
+
+/**
+ * Publier wizard — 4-step publishing flow with a live preview
+ * column on desktop. Each step answers a plain-language question
+ * ("Votre bien" / "Où ?" / "Comment le montrer ?" / "Combien ?")
+ * so the user always knows what's being asked and why.
+ */
 @Component({
   selector: "app-list-property",
   standalone: true,
@@ -48,14 +57,35 @@ interface WizardStep {
 })
 export class ListPropertyComponent {
   readonly i18n = inject(I18nService);
+  readonly Math = Math;
 
   readonly steps: readonly WizardStep[] = [
-    { key: "basics", title: { fr: "L'essentiel", en: "Basics" } },
-    { key: "location", title: { fr: "Localisation", en: "Location" } },
-    { key: "photos", title: { fr: "Photos", en: "Photos" } },
-    { key: "infrastructure", title: { fr: "Infrastructure", en: "Infrastructure" } },
-    { key: "price", title: { fr: "Prix & dispo.", en: "Price & availability" } },
-    { key: "preview", title: { fr: "Aperçu", en: "Preview" } },
+    {
+      key: "bien",
+      title: { fr: "Votre bien", en: "Your property" },
+      hint: { fr: "Que publiez-vous ?", en: "What are you listing?" },
+    },
+    {
+      key: "emplacement",
+      title: { fr: "Emplacement", en: "Location" },
+      hint: { fr: "Où se trouve-t-il ?", en: "Where is it?" },
+    },
+    {
+      key: "description",
+      title: { fr: "Description & photos", en: "Description & photos" },
+      hint: {
+        fr: "Comment le présenter ?",
+        en: "How to show it off?",
+      },
+    },
+    {
+      key: "prix",
+      title: { fr: "Prix & qualité", en: "Price & quality" },
+      hint: {
+        fr: "Prix, infrastructure, publication.",
+        en: "Price, infrastructure, publication.",
+      },
+    },
   ];
 
   readonly currentIndex = signal(0);
@@ -63,13 +93,11 @@ export class ListPropertyComponent {
   readonly progress = computed(
     () => ((this.currentIndex() + 1) / this.steps.length) * 100,
   );
+  readonly previewOpen = signal(false); // mobile drawer
 
-  // Autosave indicator — toggled briefly after any field edit
+  // Autosave indicator
   readonly saving = signal(false);
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
-
-  // Expose Math for template clamps (bedroom/bathroom steppers).
-  readonly Math = Math;
 
   // ─── Form state ─────────────────────────────────────────
   readonly mode = signal<"rent" | "sale">("rent");
@@ -99,26 +127,60 @@ export class ListPropertyComponent {
 
   readonly price = signal<number | null>(null);
 
-  readonly typeOptions: readonly PropertyType[] = [
-    "apartment",
-    "house",
-    "compound",
-    "studio",
-    "servants_quarters",
-    "commercial",
-    "office",
-    "land",
+  readonly typeOptions: readonly TypeOption[] = [
+    { key: "apartment", icon: "building", fr: "Appartement", en: "Apartment",
+      blurb: { fr: "Dans un immeuble", en: "In a building" } },
+    { key: "house",     icon: "home",     fr: "Maison",      en: "House",
+      blurb: { fr: "Villa ou maison indépendante", en: "Villa or stand-alone house" } },
+    { key: "compound",  icon: "shield",   fr: "Compound",    en: "Compound",
+      blurb: { fr: "Plusieurs bâtiments sécurisés", en: "Multi-building secure plot" } },
+    { key: "studio",    icon: "sparkles", fr: "Studio",      en: "Studio",
+      blurb: { fr: "Pièce unique meublée", en: "Single furnished room" } },
+    { key: "servants_quarters", icon: "user", fr: "Servants Quarters", en: "Servants Quarters",
+      blurb: { fr: "Logement annexe indépendant", en: "Independent annex" } },
+    { key: "land",      icon: "leaf",     fr: "Terrain",     en: "Land",
+      blurb: { fr: "Terrain nu, agricole ou à bâtir", en: "Raw, farmland, or building plot" } },
+    { key: "commercial", icon: "store",   fr: "Commerce",    en: "Commercial",
+      blurb: { fr: "Boutique, restaurant, local", en: "Shop, restaurant, retail space" } },
+    { key: "office",    icon: "building", fr: "Bureau",      en: "Office",
+      blurb: { fr: "Espace professionnel", en: "Professional space" } },
   ];
 
   readonly cities = ["Douala", "Yaoundé", "Bafoussam", "Kribi", "Limbe"];
 
+  // Context-aware visibility: a land listing hides bed/bath/area.
+  readonly isLand = computed(() => this.type() === "land");
+
   readonly ready = computed(() => {
     return (
       this.title().trim().length >= 6 &&
-      this.city() &&
+      !!this.city() &&
       this.price() != null &&
       this.price()! > 0
     );
+  });
+
+  readonly completeness = computed(() => {
+    // Rough percentage of required+optional fields filled. Powers the
+    // preview card's "Votre annonce à X %" meter so the user feels
+    // forward momentum even mid-flow.
+    let filled = 0;
+    const total = 8;
+    if (this.type()) filled++;
+    if (this.mode()) filled++;
+    if (this.city()) filled++;
+    if (this.neighborhood()) filled++;
+    if (this.title().trim().length >= 6) filled++;
+    if (this.description().trim().length >= 40) filled++;
+    if (this.photos().length) filled++;
+    if (this.price() != null && this.price()! > 0) filled++;
+    return Math.round((filled / total) * 100);
+  });
+
+  /** Helper: translated type label for the live preview card. */
+  readonly typeLabel = computed(() => {
+    const t = this.typeOptions.find((o) => o.key === this.type());
+    return t ? t[this.i18n.locale()] : this.type();
   });
 
   next(): void {
@@ -136,13 +198,15 @@ export class ListPropertyComponent {
   }
 
   jump(i: number): void {
-    if (i <= this.currentIndex()) {
-      this.currentIndex.set(i);
-    }
+    if (i <= this.currentIndex()) this.currentIndex.set(i);
+  }
+
+  setType(t: PropertyType): void {
+    this.type.set(t);
+    this.flashSaved();
   }
 
   addPhoto(): void {
-    // Stub — in production this opens a file picker.
     const placeholders = [
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80",
@@ -167,12 +231,15 @@ export class ListPropertyComponent {
     this.saveTimer = setTimeout(() => this.saving.set(false), 700);
   }
 
+  togglePreview(): void {
+    this.previewOpen.update((v) => !v);
+  }
+
   submit(): void {
-    // Stub — would call PropertyService.create(…) against the API.
     alert(
       this.i18n.locale() === "fr"
-        ? "Annonce envoyée pour modération. Vous recevrez une notification."
-        : "Listing submitted for review. You will receive a notification.",
+        ? "Annonce envoyée pour modération. Vous recevrez une notification sous 24 h."
+        : "Listing submitted for review. You'll receive a notification within 24 h.",
     );
   }
 }

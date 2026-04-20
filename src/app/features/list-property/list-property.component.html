@@ -1,33 +1,54 @@
 <section class="lw">
-  <div class="container lw__inner">
-    <header class="lw__head">
+  <!-- ═══════════════ HEADER (always visible) ═══════════════ -->
+  <header class="lw__top container">
+    <div class="lw__top-meta">
       <span class="eyebrow">— {{ 'nav.list' | t }}</span>
       <h1 class="lw__title">
         {{ i18n.locale() === 'fr' ? 'Publier votre bien' : 'List your property' }}
-        <span class="display-italic">{{ i18n.locale() === 'fr' ? ' gratuitement.' : ' for free.' }}</span>
+        <span class="display-italic">{{ i18n.locale() === 'fr' ? ' en 4 étapes.' : ' in 4 steps.' }}</span>
       </h1>
-
+    </div>
+    <div class="lw__top-status">
       <div class="lw__save" aria-live="polite">
         @if (saving()) {
           <span class="lw__save-dot" aria-hidden="true"></span>
           <span>{{ i18n.locale() === 'fr' ? 'Enregistré' : 'Saved' }}</span>
         } @else {
-          <span class="lw__save-idle">{{ i18n.locale() === 'fr' ? 'Auto-enregistré' : 'Auto-saved' }}</span>
+          <span class="lw__save-idle">
+            <app-icon name="check" [size]="12" [strokeWidth]="2.5" />
+            {{ i18n.locale() === 'fr' ? 'Auto-enregistré' : 'Auto-saved' }}
+          </span>
         }
       </div>
-    </header>
+      <button type="button" class="lw__preview-toggle" (click)="togglePreview()">
+        <app-icon name="sparkles" [size]="14" />
+        <span>{{ i18n.locale() === 'fr' ? 'Aperçu' : 'Preview' }}</span>
+      </button>
+    </div>
+  </header>
 
-    <!-- Progress rail -->
+  <!-- Mobile progress bar -->
+  <div class="lw__progress-m container" role="progressbar" [attr.aria-valuenow]="progress()">
+    <span class="lw__progress-label">
+      {{ i18n.locale() === 'fr' ? 'Étape' : 'Step' }}
+      <strong>{{ currentIndex() + 1 }}</strong> / {{ steps.length }}
+      <em>· {{ current().title[i18n.locale()] }}</em>
+    </span>
+    <div class="lw__progress-track">
+      <span class="lw__progress-fill" [style.width.%]="progress()"></span>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 3-COLUMN LAYOUT ═══════════════ -->
+  <div class="container lw__grid">
+    <!-- ── LEFT RAIL: steps nav ── -->
     <nav class="lw__rail" aria-label="Wizard steps">
-      <div class="lw__rail-bar">
-        <span class="lw__rail-fill" [style.width.%]="progress()"></span>
-      </div>
-      <ol class="lw__rail-steps">
+      <ol>
         @for (s of steps; track s.key; let i = $index) {
           <li>
             <button
               type="button"
-              class="lw__rail-step"
+              class="lw__rail-item"
               [class.is-active]="i === currentIndex()"
               [class.is-done]="i < currentIndex()"
               [disabled]="i > currentIndex()"
@@ -35,247 +56,417 @@
             >
               <span class="lw__rail-num">
                 @if (i < currentIndex()) {
-                  <app-icon name="check" [size]="14" [strokeWidth]="2.5" />
+                  <app-icon name="check" [size]="13" [strokeWidth]="2.5" />
                 } @else {
                   {{ i + 1 }}
                 }
               </span>
-              <span class="lw__rail-label">{{ s.title[i18n.locale()] }}</span>
+              <span class="lw__rail-text">
+                <strong>{{ s.title[i18n.locale()] }}</strong>
+                <small>{{ s.hint[i18n.locale()] }}</small>
+              </span>
             </button>
           </li>
         }
       </ol>
+
+      <aside class="lw__rail-tip">
+        <app-icon name="sparkles" [size]="14" />
+        <p>
+          {{ i18n.locale() === 'fr'
+            ? 'Votre annonce s\'enregistre automatiquement à chaque champ modifié.'
+            : 'Your listing auto-saves on every field change.' }}
+        </p>
+      </aside>
     </nav>
 
-    <!-- Step panels -->
+    <!-- ── CENTER: the current step ── -->
     <div class="lw__panel" [attr.data-step]="current().key">
-      <!-- Basics -->
-      @if (current().key === 'basics') {
-        <div class="lw__grid">
-          <div class="lw__field lw__field--full">
-            <label>{{ i18n.locale() === 'fr' ? 'Louer ou vendre ?' : 'Rent or sell?' }}</label>
-            <div class="lw__chipset">
-              <app-chip [active]="mode() === 'rent'" (clicked)="mode.set('rent'); flashSaved()">{{ 'common.forRent' | t }}</app-chip>
-              <app-chip [active]="mode() === 'sale'" (clicked)="mode.set('sale'); flashSaved()">{{ 'common.forSale' | t }}</app-chip>
+      <!-- Step header — question-style -->
+      <header class="lw__panel-head">
+        <span class="lw__step-num mono">Étape {{ currentIndex() + 1 }} / {{ steps.length }}</span>
+        <h2>{{ current().hint[i18n.locale()] }}</h2>
+      </header>
+
+      <!-- ═════ STEP 1 : BIEN ═════ -->
+      @if (current().key === 'bien') {
+        <div class="lw__form">
+          <div class="lw__block">
+            <label class="lw__q">{{ i18n.locale() === 'fr' ? 'Louer ou vendre ?' : 'Rent or sell?' }}</label>
+            <div class="lw__toggle">
+              <button
+                type="button"
+                class="lw__toggle-btn"
+                [class.is-active]="mode() === 'rent'"
+                (click)="mode.set('rent'); flashSaved()">
+                <strong>{{ i18n.locale() === 'fr' ? 'Louer' : 'Rent' }}</strong>
+                <small>{{ i18n.locale() === 'fr' ? 'Loyer mensuel' : 'Monthly rent' }}</small>
+              </button>
+              <button
+                type="button"
+                class="lw__toggle-btn"
+                [class.is-active]="mode() === 'sale'"
+                (click)="mode.set('sale'); flashSaved()">
+                <strong>{{ i18n.locale() === 'fr' ? 'Vendre' : 'Sell' }}</strong>
+                <small>{{ i18n.locale() === 'fr' ? 'Prix total' : 'Total price' }}</small>
+              </button>
             </div>
           </div>
 
-          <div class="lw__field lw__field--full">
-            <label>{{ i18n.locale() === 'fr' ? 'Type de bien' : 'Property type' }}</label>
-            <div class="lw__chipset">
-              @for (t of typeOptions; track t) {
-                <app-chip [active]="type() === t" (clicked)="type.set(t); flashSaved()">
-                  {{ ('categories.' + (t === 'servants_quarters' ? 'sq' : t)) | t }}
-                </app-chip>
+          <div class="lw__block">
+            <label class="lw__q">{{ i18n.locale() === 'fr' ? 'Quel type de bien ?' : 'What kind of property?' }}</label>
+            <div class="lw__tiles">
+              @for (opt of typeOptions; track opt.key) {
+                <button
+                  type="button"
+                  class="lw__tile"
+                  [class.is-active]="type() === opt.key"
+                  (click)="setType(opt.key)">
+                  <span class="lw__tile-ic">
+                    <app-icon [name]="opt.icon" [size]="22" [strokeWidth]="1.5" />
+                  </span>
+                  <strong>{{ i18n.locale() === 'fr' ? opt.fr : opt.en }}</strong>
+                  <small>{{ opt.blurb[i18n.locale()] }}</small>
+                </button>
               }
             </div>
           </div>
 
-          <div class="lw__field lw__field--full">
-            <label for="lw-title">{{ i18n.locale() === 'fr' ? "Titre de l'annonce" : 'Listing title' }}</label>
-            <input id="lw-title" type="text" class="lw__input"
-              [placeholder]="i18n.locale() === 'fr' ? 'Ex : Villa moderne avec piscine — Bonanjo' : 'Ex: Modern villa with pool — Bonanjo'"
-              [ngModel]="title()" (ngModelChange)="title.set($event); flashSaved()" />
-            <small>{{ i18n.locale() === 'fr' ? 'Minimum 6 caractères. Soyez spécifique.' : 'At least 6 characters. Be specific.' }}</small>
-          </div>
+          <!-- Room / area block — hidden for land -->
+          @if (!isLand()) {
+            <div class="lw__block">
+              <label class="lw__q">{{ i18n.locale() === 'fr' ? 'Combien de pièces et quelle surface ?' : 'How many rooms and what area?' }}</label>
+              <div class="lw__nums">
+                <div class="lw__num">
+                  <span class="lw__num-label"><app-icon name="bed" [size]="14" /> {{ 'common.bedrooms' | t }}</span>
+                  <div class="lw__stepper">
+                    <button type="button" (click)="bedrooms.set(Math.max(0, bedrooms()-1)); flashSaved()" aria-label="-">−</button>
+                    <span class="mono">{{ bedrooms() }}</span>
+                    <button type="button" (click)="bedrooms.set(bedrooms()+1); flashSaved()" aria-label="+">+</button>
+                  </div>
+                </div>
+                <div class="lw__num">
+                  <span class="lw__num-label"><app-icon name="bath" [size]="14" /> {{ 'common.bathrooms' | t }}</span>
+                  <div class="lw__stepper">
+                    <button type="button" (click)="bathrooms.set(Math.max(0, bathrooms()-1)); flashSaved()" aria-label="-">−</button>
+                    <span class="mono">{{ bathrooms() }}</span>
+                    <button type="button" (click)="bathrooms.set(bathrooms()+1); flashSaved()" aria-label="+">+</button>
+                  </div>
+                </div>
+                <div class="lw__num lw__num--wide">
+                  <span class="lw__num-label"><app-icon name="ruler" [size]="14" /> {{ i18n.locale() === 'fr' ? 'Surface habitable' : 'Living area' }}</span>
+                  <div class="lw__inputwrap">
+                    <input type="number" inputmode="numeric" [ngModel]="livingArea()" (ngModelChange)="livingArea.set($event ? +$event : null); flashSaved()" placeholder="0" />
+                    <span class="lw__suffix mono">m²</span>
+                  </div>
+                </div>
+              </div>
 
-          <div class="lw__field lw__field--full">
-            <label for="lw-desc">Description</label>
-            <textarea id="lw-desc" class="lw__input lw__textarea" rows="5"
-              [placeholder]="i18n.locale() === 'fr' ? 'Détails : état, particularités, voisinage…' : 'Details: condition, features, neighborhood…'"
-              [ngModel]="description()" (ngModelChange)="description.set($event); flashSaved()"></textarea>
-          </div>
-
-          <div class="lw__field">
-            <label>{{ 'common.bedrooms' | t }}</label>
-            <div class="lw__stepper">
-              <button type="button" (click)="bedrooms.set(Math.max(0, bedrooms()-1)); flashSaved()" aria-label="-">−</button>
-              <span class="mono">{{ bedrooms() }}</span>
-              <button type="button" (click)="bedrooms.set(bedrooms()+1); flashSaved()" aria-label="+">+</button>
+              <label class="lw__check-inline">
+                <input type="checkbox" [checked]="furnished()" (change)="furnished.set($any($event.target).checked); flashSaved()" />
+                <span>{{ i18n.locale() === 'fr' ? 'Le bien est meublé' : 'The property is furnished' }}</span>
+              </label>
             </div>
-          </div>
-          <div class="lw__field">
-            <label>{{ 'common.bathrooms' | t }}</label>
-            <div class="lw__stepper">
-              <button type="button" (click)="bathrooms.set(Math.max(0, bathrooms()-1)); flashSaved()" aria-label="-">−</button>
-              <span class="mono">{{ bathrooms() }}</span>
-              <button type="button" (click)="bathrooms.set(bathrooms()+1); flashSaved()" aria-label="+">+</button>
+          } @else {
+            <div class="lw__block">
+              <label class="lw__q">{{ i18n.locale() === 'fr' ? 'Superficie du terrain ?' : 'Land area?' }}</label>
+              <div class="lw__inputwrap lw__inputwrap--big">
+                <input type="number" inputmode="numeric" [ngModel]="landArea()" (ngModelChange)="landArea.set($event ? +$event : null); flashSaved()" placeholder="0" />
+                <span class="lw__suffix mono">m²</span>
+              </div>
             </div>
-          </div>
-          <div class="lw__field">
-            <label for="lw-area">{{ i18n.locale() === 'fr' ? 'Surface habitable (m²)' : 'Living area (m²)' }}</label>
-            <input id="lw-area" type="number" inputmode="numeric" class="lw__input" [ngModel]="livingArea()" (ngModelChange)="livingArea.set($event ? +$event : null); flashSaved()" />
-          </div>
-          <div class="lw__field">
-            <label>{{ i18n.locale() === 'fr' ? 'Meublé ?' : 'Furnished?' }}</label>
-            <div class="lw__chipset">
-              <app-chip [active]="!furnished()" (clicked)="furnished.set(false); flashSaved()">{{ i18n.locale() === 'fr' ? 'Non' : 'No' }}</app-chip>
-              <app-chip [active]="furnished()" (clicked)="furnished.set(true); flashSaved()">{{ i18n.locale() === 'fr' ? 'Oui' : 'Yes' }}</app-chip>
-            </div>
-          </div>
+          }
         </div>
       }
 
-      <!-- Location -->
-      @if (current().key === 'location') {
-        <div class="lw__grid">
-          <div class="lw__field lw__field--full">
-            <label>{{ i18n.locale() === 'fr' ? 'Ville' : 'City' }}</label>
-            <div class="lw__chipset">
+      <!-- ═════ STEP 2 : EMPLACEMENT ═════ -->
+      @if (current().key === 'emplacement') {
+        <div class="lw__form">
+          <div class="lw__block">
+            <label class="lw__q">{{ i18n.locale() === 'fr' ? 'Dans quelle ville ?' : 'Which city?' }}</label>
+            <div class="lw__tiles lw__tiles--compact">
               @for (c of cities; track c) {
-                <app-chip icon="pin" [active]="city() === c" (clicked)="city.set(c); flashSaved()">{{ c }}</app-chip>
+                <button
+                  type="button"
+                  class="lw__tile lw__tile--city"
+                  [class.is-active]="city() === c"
+                  (click)="city.set(c); flashSaved()">
+                  <span class="lw__tile-ic"><app-icon name="pin" [size]="18" [strokeWidth]="1.5" /></span>
+                  <strong>{{ c }}</strong>
+                </button>
               }
             </div>
           </div>
-          <div class="lw__field lw__field--full">
-            <label for="lw-nbhd">{{ i18n.locale() === 'fr' ? 'Quartier' : 'Neighborhood' }}</label>
-            <input id="lw-nbhd" type="text" class="lw__input"
-              [placeholder]="i18n.locale() === 'fr' ? 'Ex : Bonanjo' : 'Ex: Bonanjo'"
+
+          <div class="lw__block">
+            <label class="lw__q" for="lw-nbhd">{{ i18n.locale() === 'fr' ? 'Quel quartier ?' : 'Which neighborhood?' }}</label>
+            <input id="lw-nbhd" class="lw__input" type="text"
+              [placeholder]="i18n.locale() === 'fr' ? 'Ex : Bonanjo, Akwa, Bastos…' : 'Ex: Bonanjo, Akwa, Bastos…'"
               [ngModel]="neighborhood()" (ngModelChange)="neighborhood.set($event); flashSaved()" />
+            <small class="lw__hint">{{ i18n.locale() === 'fr' ? 'Les acheteurs recherchent d\'abord par quartier — soyez précis.' : 'Buyers search by neighborhood first — be precise.' }}</small>
           </div>
-          <div class="lw__map lw__field--full">
+
+          <div class="lw__block">
+            <label class="lw__q">{{ i18n.locale() === 'fr' ? 'Placer sur la carte' : 'Pin on the map' }}</label>
             <div class="lw__map-stub">
               <app-icon name="pin" [size]="32" [strokeWidth]="1.3" />
-              <p>{{ i18n.locale() === 'fr' ? 'Cliquez sur la carte pour placer votre bien (à venir).' : 'Click on the map to pin your property (coming soon).' }}</p>
+              <p><strong>{{ neighborhood() || '—' }}, {{ city() }}</strong></p>
+              <small>{{ i18n.locale() === 'fr' ? 'Carte interactive à venir. L\'emplacement exact sera masqué pour votre sécurité.' : 'Interactive map coming soon. The exact location is hidden for your safety.' }}</small>
             </div>
           </div>
         </div>
       }
 
-      <!-- Photos -->
-      @if (current().key === 'photos') {
-        <div class="lw__photos">
-          <header>
-            <h2 class="lw__sub">{{ i18n.locale() === 'fr' ? 'Ajoutez jusqu\'à 12 photos' : 'Add up to 12 photos' }}</h2>
-            <p class="muted">{{ i18n.locale() === 'fr' ? 'La première photo sera la photo principale. Formats JPG, PNG, WebP.' : 'The first photo becomes the main one. JPG, PNG, WebP.' }}</p>
-          </header>
-          <div class="lw__photogrid">
-            @for (p of photos(); track $index; let i = $index) {
-              <figure class="lw__photo" [class.is-cover]="i === 0">
-                <img [src]="p" alt="" />
-                @if (i === 0) { <span class="lw__photo-tag">{{ i18n.locale() === 'fr' ? 'Principale' : 'Main' }}</span> }
-                <button type="button" (click)="removePhoto(i)" [attr.aria-label]="i18n.locale() === 'fr' ? 'Supprimer' : 'Remove'">
-                  <app-icon name="close" [size]="14" [strokeWidth]="2" />
+      <!-- ═════ STEP 3 : DESCRIPTION & PHOTOS ═════ -->
+      @if (current().key === 'description') {
+        <div class="lw__form">
+          <div class="lw__block">
+            <label class="lw__q" for="lw-title">{{ i18n.locale() === 'fr' ? 'Donnez un titre accrocheur' : 'Give it a strong title' }}</label>
+            <input id="lw-title" class="lw__input lw__input--big" type="text"
+              [placeholder]="i18n.locale() === 'fr' ? 'Ex : Villa moderne avec piscine — Bonanjo' : 'Ex: Modern villa with pool — Bonanjo'"
+              [ngModel]="title()" (ngModelChange)="title.set($event); flashSaved()" />
+            <small class="lw__hint">
+              {{ i18n.locale() === 'fr' ? 'Le titre est la première chose que les chercheurs voient. Minimum 6 caractères.' : 'The title is the first thing searchers see. Minimum 6 characters.' }}
+              <span class="mono">{{ title().length }}/80</span>
+            </small>
+          </div>
+
+          <div class="lw__block">
+            <label class="lw__q" for="lw-desc">{{ i18n.locale() === 'fr' ? 'Décrivez le bien' : 'Describe the property' }}</label>
+            <textarea id="lw-desc" class="lw__input lw__textarea" rows="5"
+              [placeholder]="i18n.locale() === 'fr' ? 'Parlez de l\'ambiance, des particularités, du voisinage. Les bons détails attirent les bons acheteurs.' : 'Talk about the vibe, the standout details, the neighborhood. Good detail attracts the right buyers.'"
+              [ngModel]="description()" (ngModelChange)="description.set($event); flashSaved()"></textarea>
+            <small class="lw__hint">
+              {{ description().length < 40
+                ? (i18n.locale() === 'fr' ? 'Écrivez au moins 40 caractères pour donner du corps à votre annonce.' : 'Write at least 40 characters to give your listing substance.')
+                : (i18n.locale() === 'fr' ? '✓ Bonne longueur' : '✓ Good length') }}
+              <span class="mono">· {{ description().length }} caractères</span>
+            </small>
+          </div>
+
+          <div class="lw__block">
+            <label class="lw__q">{{ i18n.locale() === 'fr' ? 'Photos' : 'Photos' }}</label>
+            <small class="lw__hint">
+              {{ i18n.locale() === 'fr'
+                ? 'La première photo sera la principale. 3 photos minimum recommandées. Jusqu\'à 12.'
+                : 'The first photo becomes the main one. At least 3 recommended. Up to 12.' }}
+            </small>
+            <div class="lw__photogrid">
+              @for (p of photos(); track $index; let i = $index) {
+                <figure class="lw__photo" [class.is-cover]="i === 0">
+                  <img [src]="p" alt="" />
+                  @if (i === 0) { <span class="lw__photo-tag">{{ i18n.locale() === 'fr' ? 'Principale' : 'Main' }}</span> }
+                  <button type="button" (click)="removePhoto(i)" [attr.aria-label]="i18n.locale() === 'fr' ? 'Supprimer' : 'Remove'">
+                    <app-icon name="close" [size]="14" [strokeWidth]="2" />
+                  </button>
+                </figure>
+              }
+              @if (photos().length < 12) {
+                <button type="button" class="lw__photo-add" (click)="addPhoto()">
+                  <app-icon name="sparkles" [size]="22" />
+                  <span>{{ i18n.locale() === 'fr' ? 'Ajouter une photo' : 'Add a photo' }}</span>
+                  <em>{{ photos().length }}/12</em>
                 </button>
-              </figure>
-            }
-            @if (photos().length < 12) {
-              <button type="button" class="lw__photo-add" (click)="addPhoto()">
-                <app-icon name="sparkles" [size]="22" />
-                <span>{{ i18n.locale() === 'fr' ? 'Ajouter une photo' : 'Add a photo' }}</span>
-              </button>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- Infrastructure -->
-      @if (current().key === 'infrastructure') {
-        <div class="lw__grid">
-          <div class="lw__field">
-            <label><app-icon name="droplet" [size]="16" /> {{ i18n.locale() === 'fr' ? 'Eau' : 'Water' }}</label>
-            <div class="lw__chipset">
-              <app-chip [active]="water() === 'city'" (clicked)="water.set('city'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Réseau' : 'City' }}</app-chip>
-              <app-chip [active]="water() === 'borehole'" (clicked)="water.set('borehole'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Forage' : 'Borehole' }}</app-chip>
-              <app-chip [active]="water() === 'tank'" (clicked)="water.set('tank'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Tank' : 'Tank' }}</app-chip>
-            </div>
-          </div>
-          <div class="lw__field">
-            <label><app-icon name="bolt" [size]="16" /> {{ i18n.locale() === 'fr' ? 'Électricité' : 'Power' }}</label>
-            <div class="lw__chipset">
-              <app-chip [active]="power() === 'grid'" (clicked)="power.set('grid'); flashSaved()">ENEO</app-chip>
-              <app-chip [active]="power() === 'grid_generator'" (clicked)="power.set('grid_generator'); flashSaved()">ENEO + Gén.</app-chip>
-              <app-chip [active]="power() === 'solar'" (clicked)="power.set('solar'); flashSaved()">Solaire</app-chip>
-            </div>
-          </div>
-          <div class="lw__field">
-            <label><app-icon name="road" [size]="16" /> {{ i18n.locale() === 'fr' ? 'Route' : 'Road' }}</label>
-            <div class="lw__chipset">
-              <app-chip [active]="road() === 'paved'" (clicked)="road.set('paved'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Bitume' : 'Paved' }}</app-chip>
-              <app-chip [active]="road() === 'gravel'" (clicked)="road.set('gravel'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Latérite' : 'Gravel' }}</app-chip>
-              <app-chip [active]="road() === 'dirt'" (clicked)="road.set('dirt'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Terre' : 'Dirt' }}</app-chip>
-            </div>
-          </div>
-          <div class="lw__field">
-            <label><app-icon name="shield" [size]="16" /> {{ i18n.locale() === 'fr' ? 'Sécurité' : 'Security' }}</label>
-            <div class="lw__chipset">
-              <app-chip [active]="security() === 'open'" (clicked)="security.set('open'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Ouvert' : 'Open' }}</app-chip>
-              <app-chip [active]="security() === 'fenced'" (clicked)="security.set('fenced'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Clôturé' : 'Fenced' }}</app-chip>
-              <app-chip [active]="security() === 'gated'" (clicked)="security.set('gated'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Barrière' : 'Gated' }}</app-chip>
-              <app-chip [active]="security() === 'guarded'" (clicked)="security.set('guarded'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Gardien 24/7' : 'Guarded' }}</app-chip>
-            </div>
-          </div>
-        </div>
-      }
-
-      <!-- Price -->
-      @if (current().key === 'price') {
-        <div class="lw__grid">
-          <div class="lw__field lw__field--full">
-            <label for="lw-price">
-              {{ i18n.locale() === 'fr' ? (mode() === 'rent' ? 'Loyer mensuel (FCFA)' : 'Prix de vente (FCFA)') : (mode() === 'rent' ? 'Monthly rent (XAF)' : 'Sale price (XAF)') }}
-            </label>
-            <input id="lw-price" type="number" inputmode="numeric" class="lw__input lw__input--big mono"
-              placeholder="0" [ngModel]="price()" (ngModelChange)="price.set($event ? +$event : null); flashSaved()" />
-            <small>{{ i18n.locale() === 'fr' ? "Les montants sont affichés en francs CFA, sans décimales." : 'Amounts are displayed in XAF, without decimals.' }}</small>
-          </div>
-        </div>
-      }
-
-      <!-- Preview -->
-      @if (current().key === 'preview') {
-        <div class="lw__preview">
-          <div class="lw__preview-card">
-            <div class="lw__preview-img">
-              @if (photos().length) {
-                <img [src]="photos()[0]" alt="" />
-              } @else {
-                <div class="lw__preview-empty"><app-icon name="sparkles" [size]="32" /></div>
               }
             </div>
-            <div class="lw__preview-body">
-              <app-badge tone="accent">{{ mode() === 'rent' ? ('common.forRent' | t) : ('common.forSale' | t) }}</app-badge>
-              <h3>{{ title() || (i18n.locale() === 'fr' ? 'Titre de votre annonce' : 'Your listing title') }}</h3>
-              <p class="muted">{{ neighborhood() || '—' }}, {{ city() }}</p>
-              <p>{{ description() || (i18n.locale() === 'fr' ? 'Votre description apparaîtra ici.' : 'Your description will appear here.') }}</p>
-              <div class="lw__preview-specs">
-                <span><app-icon name="bed" [size]="14" /> {{ bedrooms() }}</span>
-                <span><app-icon name="bath" [size]="14" /> {{ bathrooms() }}</span>
-                @if (livingArea()) {
-                  <span><app-icon name="ruler" [size]="14" /> {{ livingArea() }} m²</span>
-                }
+          </div>
+        </div>
+      }
+
+      <!-- ═════ STEP 4 : PRIX & INFRASTRUCTURE ═════ -->
+      @if (current().key === 'prix') {
+        <div class="lw__form">
+          <div class="lw__block">
+            <label class="lw__q" for="lw-price">
+              {{ i18n.locale() === 'fr'
+                ? (mode() === 'rent' ? 'Loyer mensuel' : 'Prix de vente')
+                : (mode() === 'rent' ? 'Monthly rent' : 'Sale price') }}
+            </label>
+            <div class="lw__price-row">
+              <input id="lw-price" class="lw__input lw__input--price mono" type="number" inputmode="numeric"
+                placeholder="0" [ngModel]="price()" (ngModelChange)="price.set($event ? +$event : null); flashSaved()" />
+              <span class="lw__price-unit">
+                FCFA {{ mode() === 'rent' ? (i18n.locale() === 'fr' ? '/ mois' : '/ month') : '' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="lw__block">
+            <label class="lw__q">
+              {{ i18n.locale() === 'fr' ? 'Infrastructure du bien' : 'Property infrastructure' }}
+              <app-badge tone="accent">{{ i18n.locale() === 'fr' ? 'Important' : 'Important' }}</app-badge>
+            </label>
+            <small class="lw__hint">
+              {{ i18n.locale() === 'fr'
+                ? 'Au Cameroun, ces détails changent tout. Les chercheurs filtrent par ces critères.'
+                : 'In Cameroon these details matter. Searchers filter on them.' }}
+            </small>
+
+            <div class="lw__infra-grid">
+              <div class="lw__infra">
+                <label><app-icon name="droplet" [size]="16" /> {{ i18n.locale() === 'fr' ? 'Eau' : 'Water' }}</label>
+                <div class="lw__chipset">
+                  <app-chip [active]="water() === 'city'" (clicked)="water.set('city'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Réseau' : 'City' }}</app-chip>
+                  <app-chip [active]="water() === 'borehole'" (clicked)="water.set('borehole'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Forage' : 'Borehole' }}</app-chip>
+                  <app-chip [active]="water() === 'tank'" (clicked)="water.set('tank'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Tank' : 'Tank' }}</app-chip>
+                </div>
               </div>
-              <strong class="lw__preview-price mono">{{ price() ? (price() + ' FCFA') : '— FCFA' }}</strong>
+              <div class="lw__infra">
+                <label><app-icon name="bolt" [size]="16" /> {{ i18n.locale() === 'fr' ? 'Électricité' : 'Power' }}</label>
+                <div class="lw__chipset">
+                  <app-chip [active]="power() === 'grid'" (clicked)="power.set('grid'); flashSaved()">ENEO</app-chip>
+                  <app-chip [active]="power() === 'grid_generator'" (clicked)="power.set('grid_generator'); flashSaved()">ENEO + Gén.</app-chip>
+                  <app-chip [active]="power() === 'solar'" (clicked)="power.set('solar'); flashSaved()">Solaire</app-chip>
+                </div>
+              </div>
+              <div class="lw__infra">
+                <label><app-icon name="road" [size]="16" /> {{ i18n.locale() === 'fr' ? 'Accès' : 'Road' }}</label>
+                <div class="lw__chipset">
+                  <app-chip [active]="road() === 'paved'" (clicked)="road.set('paved'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Bitume' : 'Paved' }}</app-chip>
+                  <app-chip [active]="road() === 'gravel'" (clicked)="road.set('gravel'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Latérite' : 'Gravel' }}</app-chip>
+                  <app-chip [active]="road() === 'dirt'" (clicked)="road.set('dirt'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Terre' : 'Dirt' }}</app-chip>
+                </div>
+              </div>
+              <div class="lw__infra">
+                <label><app-icon name="shield" [size]="16" /> {{ i18n.locale() === 'fr' ? 'Sécurité' : 'Security' }}</label>
+                <div class="lw__chipset">
+                  <app-chip [active]="security() === 'open'" (clicked)="security.set('open'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Ouvert' : 'Open' }}</app-chip>
+                  <app-chip [active]="security() === 'fenced'" (clicked)="security.set('fenced'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Clôturé' : 'Fenced' }}</app-chip>
+                  <app-chip [active]="security() === 'gated'" (clicked)="security.set('gated'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Barrière' : 'Gated' }}</app-chip>
+                  <app-chip [active]="security() === 'guarded'" (clicked)="security.set('guarded'); flashSaved()">{{ i18n.locale() === 'fr' ? 'Gardien 24/7' : 'Guarded' }}</app-chip>
+                </div>
+              </div>
             </div>
           </div>
 
           @if (!ready()) {
-            <p class="lw__warn">
+            <div class="lw__warn">
               <app-icon name="sparkles" [size]="14" />
-              {{ i18n.locale() === 'fr' ? 'Complétez le titre et le prix pour publier.' : 'Complete the title and the price to publish.' }}
-            </p>
+              <span>
+                {{ i18n.locale() === 'fr'
+                  ? 'Il manque encore : un titre (min. 6 car.) et un prix.'
+                  : 'Missing: a title (min. 6 chars) and a price.' }}
+              </span>
+            </div>
           }
         </div>
       }
+
+      <!-- ── FOOTER NAV ── -->
+      <footer class="lw__foot">
+        <button appButton variant="ghost" (click)="prev()" [disabled]="currentIndex() === 0">
+          <app-icon slot="leading" name="chevron" [size]="16" />
+          {{ i18n.locale() === 'fr' ? 'Précédent' : 'Back' }}
+        </button>
+        <span class="lw__foot-spacer">
+          {{ i18n.locale() === 'fr'
+            ? 'Étape ' + (currentIndex() + 1) + ' / ' + steps.length
+            : 'Step ' + (currentIndex() + 1) + ' / ' + steps.length }}
+        </span>
+        @if (currentIndex() < steps.length - 1) {
+          <button appButton variant="primary" size="lg" (click)="next()">
+            {{ i18n.locale() === 'fr' ? 'Continuer' : 'Continue' }}
+            <app-icon slot="trailing" name="arrow" [size]="16" />
+          </button>
+        } @else {
+          <button appButton variant="primary" size="lg" (click)="submit()" [disabled]="!ready()">
+            {{ i18n.locale() === 'fr' ? 'Publier l\'annonce' : 'Publish listing' }}
+            <app-icon slot="trailing" name="check" [size]="16" [strokeWidth]="2.5" />
+          </button>
+        }
+      </footer>
     </div>
 
-    <!-- Footer nav -->
-    <footer class="lw__foot">
-      <button appButton variant="secondary" (click)="prev()" [disabled]="currentIndex() === 0">
-        <app-icon slot="leading" name="chevron" [size]="16" />
-        {{ i18n.locale() === 'fr' ? 'Précédent' : 'Back' }}
-      </button>
-      @if (current().key !== 'preview') {
-        <button appButton variant="primary" (click)="next()">
-          {{ i18n.locale() === 'fr' ? 'Continuer' : 'Continue' }}
-          <app-icon slot="trailing" name="arrow" [size]="16" />
+    <!-- ── RIGHT: LIVE PREVIEW ── -->
+    <aside class="lw__preview" [class.is-open]="previewOpen()" aria-label="Preview">
+      <header class="lw__preview-head">
+        <div>
+          <span class="eyebrow">— {{ i18n.locale() === 'fr' ? 'Aperçu' : 'Preview' }}</span>
+          <h3>{{ i18n.locale() === 'fr' ? 'Comment les acheteurs la verront' : 'How buyers will see it' }}</h3>
+        </div>
+        <button type="button" class="lw__preview-close" (click)="togglePreview()" aria-label="Close">
+          <app-icon name="close" [size]="18" />
         </button>
-      } @else {
-        <button appButton variant="primary" (click)="submit()" [disabled]="!ready()">
-          {{ i18n.locale() === 'fr' ? 'Publier l\'annonce' : 'Publish listing' }}
-          <app-icon slot="trailing" name="check" [size]="16" [strokeWidth]="2.5" />
-        </button>
-      }
-    </footer>
+      </header>
+
+      <!-- Property card preview -->
+      <article class="lw__card">
+        <div class="lw__card-img">
+          @if (photos().length) {
+            <img [src]="photos()[0]" alt="" />
+          } @else {
+            <div class="lw__card-empty">
+              <app-icon name="sparkles" [size]="28" />
+              <span>{{ i18n.locale() === 'fr' ? 'Ajoutez une photo' : 'Add a photo' }}</span>
+            </div>
+          }
+          <span class="lw__card-badge">
+            {{ mode() === 'rent' ? ('common.forRent' | t) : ('common.forSale' | t) }}
+          </span>
+        </div>
+        <div class="lw__card-body">
+          <span class="lw__card-loc">
+            <app-icon name="pin" [size]="12" />
+            {{ neighborhood() || '—' }}, {{ city() }}
+          </span>
+          <h4>{{ title() || (i18n.locale() === 'fr' ? 'Titre de votre annonce' : 'Your listing title') }}</h4>
+          <ul class="lw__card-specs">
+            @if (!isLand()) {
+              <li><app-icon name="bed" [size]="13" /> {{ bedrooms() }}</li>
+              <li><app-icon name="bath" [size]="13" /> {{ bathrooms() }}</li>
+              @if (livingArea()) { <li><app-icon name="ruler" [size]="13" /> {{ livingArea() }} m²</li> }
+            } @else if (landArea()) {
+              <li><app-icon name="leaf" [size]="13" /> {{ landArea() }} m²</li>
+            }
+            <li class="lw__card-type">{{ typeLabel() }}</li>
+          </ul>
+          <strong class="lw__card-price mono">
+            @if (price()) {
+              {{ price()?.toLocaleString('fr-FR') }} FCFA{{ mode() === 'rent' ? ' / mois' : '' }}
+            } @else {
+              <em>{{ i18n.locale() === 'fr' ? 'Prix —' : 'Price —' }}</em>
+            }
+          </strong>
+        </div>
+      </article>
+
+      <!-- Completeness meter -->
+      <div class="lw__meter">
+        <div class="lw__meter-head">
+          <span>{{ i18n.locale() === 'fr' ? 'Votre annonce est remplie à' : 'Your listing is' }}</span>
+          <strong class="mono">{{ completeness() }}%</strong>
+        </div>
+        <div class="lw__meter-bar">
+          <span class="lw__meter-fill" [style.width.%]="completeness()"></span>
+        </div>
+        <ul class="lw__meter-list">
+          <li [class.is-done]="type()">
+            <app-icon [name]="type() ? 'check' : 'close'" [size]="12" [strokeWidth]="2.5" /> Type
+          </li>
+          <li [class.is-done]="!!city()">
+            <app-icon [name]="city() ? 'check' : 'close'" [size]="12" [strokeWidth]="2.5" /> {{ i18n.locale() === 'fr' ? 'Ville' : 'City' }}
+          </li>
+          <li [class.is-done]="!!neighborhood()">
+            <app-icon [name]="neighborhood() ? 'check' : 'close'" [size]="12" [strokeWidth]="2.5" /> {{ i18n.locale() === 'fr' ? 'Quartier' : 'Neighborhood' }}
+          </li>
+          <li [class.is-done]="title().trim().length >= 6">
+            <app-icon [name]="title().trim().length >= 6 ? 'check' : 'close'" [size]="12" [strokeWidth]="2.5" /> {{ i18n.locale() === 'fr' ? 'Titre' : 'Title' }}
+          </li>
+          <li [class.is-done]="description().trim().length >= 40">
+            <app-icon [name]="description().trim().length >= 40 ? 'check' : 'close'" [size]="12" [strokeWidth]="2.5" /> Description
+          </li>
+          <li [class.is-done]="photos().length > 0">
+            <app-icon [name]="photos().length > 0 ? 'check' : 'close'" [size]="12" [strokeWidth]="2.5" /> Photos
+          </li>
+          <li [class.is-done]="price() !== null && (price() ?? 0) > 0">
+            <app-icon [name]="price() !== null && (price() ?? 0) > 0 ? 'check' : 'close'" [size]="12" [strokeWidth]="2.5" /> {{ i18n.locale() === 'fr' ? 'Prix' : 'Price' }}
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    @if (previewOpen()) {
+      <div class="lw__backdrop" (click)="togglePreview()" aria-hidden="true"></div>
+    }
   </div>
 </section>
